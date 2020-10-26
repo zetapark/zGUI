@@ -9,9 +9,9 @@ zeta::Widget::Widget(cv::Rect_<int> r)
 	mat_ = cv::Vec3b{0xff, 0, 0};
 }
 
-void zeta::Widget::operator>>(cv::Mat &r)
+void zeta::Widget::operator>>(zeta::Widget &r)
 {
-	mat_.copyTo(r(*this));
+	mat_.copyTo(r.mat_(*this));
 }
 
 void zeta::Widget::register_callback(int event, function<void(int, int)> f)
@@ -28,8 +28,8 @@ void zeta::Widget::focus(bool tf) {
 
 zeta::Button::Button(cv::Rect_<int> r) : zeta::Widget{r}
 {
-	gui_callback_[EVENT_ENTER] = [this](int, int) { this->mat_ = cv::Vec3b{0, 0xff, 0}; cout << "enter" << endl; }; 
-	gui_callback_[EVENT_LEAVE] = [this](int, int) { this->mat_ = cv::Vec3b{0xff, 0xff, 0}; cout << "leave" << endl; }; 
+	gui_callback_[EVENT_ENTER] = [this](int, int) { this->mat_ = cv::Vec3b{0, 0xff, 0}; }; 
+	gui_callback_[EVENT_LEAVE] = [this](int, int) { this->mat_ = cv::Vec3b{0xff, 0xff, 0}; }; 
 	gui_callback_[cv::EVENT_LBUTTONDOWN] = [this](int, int) { this->mat_ = cv::Vec3b{0, 0, 0xff}; }; 
 	gui_callback_[cv::EVENT_LBUTTONUP] = [this](int, int) { this->mat_ = cv::Vec3b{0xff, 0, 0xff}; }; 
 }
@@ -44,10 +44,10 @@ void mouse_callback(int event, int x, int y, int flags, void *ptr)
 		else if(w->focus()) {
 			if(w->gui_callback_.find(EVENT_LEAVE) != w->gui_callback_.end()) {
 				w->gui_callback_[EVENT_LEAVE](x, y);
-				*w >> p->mat_;
+				*w >> *p;
 				p->show();
 			}
-			pw->focus(false);
+			w->focus(false);
 		}
 	}
 	if(!pw) return;
@@ -55,13 +55,13 @@ void mouse_callback(int event, int x, int y, int flags, void *ptr)
 	if(event == cv::EVENT_MOUSEMOVE) {
 		if(!pw->focus() && pw->gui_callback_.find(EVENT_ENTER) != pw->gui_callback_.end()) {
 			pw->gui_callback_[EVENT_ENTER](x, y);
-			*pw >> p->mat_;
+			*pw >> *p;
 			p->show();
 			pw->focus(true);
 		} 
 	} else if(pw->gui_callback_.find(event) != pw->gui_callback_.end()) {
 		pw->gui_callback_[event](x, y);
-		*pw >> p->mat_;
+		*pw >> *p;
 		p->show();
 	}
 }

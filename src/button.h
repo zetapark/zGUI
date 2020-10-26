@@ -6,21 +6,20 @@
 
 namespace zeta {
 
-class Window;
 class Widget : public cv::Rect_<int>
 {//base class for all widgets
 public:
 	Widget(cv::Rect_<int> r);
 	bool is_updated();
 	void register_callback(int event, std::function<void(int,int)> f);
-	void operator>>(cv::Mat &r);//copy widget to window
+	void operator>>(Widget &r);//copy widget to window
 	bool focus();
 	void focus(bool);
 	std::map<int, std::function<void(int, int)>> gui_callback_;//int : event, x, y
 	std::map<int, std::function<void(int, int)>> user_callback_;
-	cv::Mat3b mat_;//widget shape
 
 protected:
+	cv::Mat3b mat_;//widget shape
 	bool focus_ = false;
 };
 

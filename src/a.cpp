@@ -113,8 +113,6 @@ int main()
 		zeta::Widget w{{700, 200, 100, 100}};
 		zeta::Button b{{100, 100, 50, 20}};
 		cv::Mat mat = cv::imread("/home/zeta/Pictures/11.jpg");
-		w >> mat;
-		b >> mat;
     cv::imshow(TITLE, mat);
   
     /// Wait until user press some key

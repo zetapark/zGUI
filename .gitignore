@@ -35,3 +35,4 @@ core
 *.app
 *.vim
 obj/catch
+catch

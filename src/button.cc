@@ -145,35 +145,22 @@ z::Popup::Popup(string title, cv::Rect2i r, string content) : z::Window{title, r
 bool z::Popup::open()
 {
 	show();
-	cout << "inside next" << endl;
-	//cv::waitKey(300);
-	cout << "waitkey collapse" << endl;
-	
-	std::unique_lock lck{mtx_};
-	while(!closed_) {
-		cv::waitKey(1);
-	}
-	cv_.wait(lck);
-	cout << "continue" << endl;
+	while(!closed_) cv::waitKey(10);
 	closed_ = false;
 	return result_;
 }
 
 void z::Popup::click_yes(int, int)
 {
-	std::unique_lock lck{mtx_};
-	cout << "yse" << endl;
-	first_ = result_ = closed_ = true;
+	first_ = result_ = true;
+	closed_ = true;
 	cv::destroyWindow(title_);
-	cv_.notify_one();
 }
 
 void z::Popup::click_no(int, int)
 {
-	std::unique_lock lck{mtx_};
-	cout << "nono" << endl;
-	first_ = closed_ = true;
+	first_ = true;
 	result_ = false; 
+	closed_ = true;
 	cv::destroyWindow(title_);
-	cv_.notify_one();
 }

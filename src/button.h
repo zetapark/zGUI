@@ -1,6 +1,3 @@
-#include<thread>
-#include<mutex>
-#include<condition_variable>
 #include<map>
 #include<functional>
 #include <opencv2/highgui.hpp>
@@ -67,8 +64,6 @@ public:
 protected:
 	Button yes_{"Yes", {30, 100, 50, 30}}, no_{"No", {100, 100, 50, 30}};
 private:
-	std::condition_variable cv_;
-	std::mutex mtx_;
 	bool closed_ = false, result_;
 	void click_yes(int, int), click_no(int, int);
 };

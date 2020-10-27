@@ -116,7 +116,7 @@ vector<z::Widget*>::iterator z::Window::end() {
 	return widgets_.end();
 }
 
-void z::Window::add(z::Widget &w)
+void z::Window::operator+=(z::Widget &w)
 {
 	widgets_.push_back(&w);
 	w >> *this;
@@ -141,8 +141,8 @@ z::Popup::Popup(string title, cv::Rect2i r, string content) : z::Window{title, r
 {
 	using namespace std::placeholders;
 	title_ = title;
-	add(yes_);
-	add(no_);
+	*this += yes_;
+	*this += no_;
 	cv::putText(mat_, content, {10, 30}, 0, 0.7, {0, 0, 0});
 	yes_.click(bind(&Popup::click_yes, this, _1, _2));
 	no_.click(bind(&Popup::click_no, this, _1, _2));
@@ -187,4 +187,13 @@ void z::CheckBox::click(int, int)
 bool z::CheckBox::checked()
 {
 	return checked_;
+}
+
+z::Image::Image(cv::Rect2i r) : Widget{r}
+{ }
+
+cv::Mat &z::Image::operator=(const cv::Mat &r)
+{
+	mat_ = r({0, 0, min(r.cols, width), min(r.rows, height)});
+	return mat_;
 }

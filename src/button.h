@@ -59,7 +59,7 @@ class Window : public Widget
 public:
 	Window(std::string title, cv::Rect_<int> r);
 	void show();
-	void add(Widget &w);
+	void operator+=(Widget &w);
 	std::vector<Widget*>::iterator begin(), end();
 	void quit();
 
@@ -81,4 +81,10 @@ private:
 	void click_yes(int, int), click_no(int, int);
 };
 
+class Image : public Widget
+{
+public:
+	Image(cv::Rect2i r);
+	cv::Mat &operator=(const cv::Mat &r);
+};
 }

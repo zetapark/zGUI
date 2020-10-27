@@ -15,13 +15,13 @@ int main()
 	z::Button btn{"Ok", {100, 100, 50, 30}};
 	z::Button btn2{"cancel", {200, 100, 100, 30}};
 	cv::Mat mat = cv::imread("/home/zeta/Pictures/11.jpg");
-	btn2.click([](int x, int y) { cout << "clicked " << x << ',' << y << endl;});
+	btn2.click([&win](int x, int y) { win.quit(); });
 	btn.click([&](int, int){ if(popup.open()) cout << "yes" << endl; else cout << "no" << endl;});
 	win.add(btn);
 	win.add(btn2);
+	z::CheckBox chk{"option", {100, 200, 20, 20}};
+	win.add(chk);
 	win.show();
-//	cout << popup.open() << endl;
-//	cout << popup.open() << endl;
 	cv::waitKey();
 }
 

@@ -124,11 +124,17 @@ void z::Window::add(z::Widget &w)
 
 void z::Window::show()
 {
-	cv::imshow(title_, mat_);
 	if(first_) {
+		cv::namedWindow(title_, 0);
 		cv::setMouseCallback(title_, mouse_callback, this);
 		first_ = false;
 	}
+	cv::imshow(title_, mat_);
+}
+
+void z::Window::quit()
+{
+	cv::destroyWindow(title_);
 }
 
 z::Popup::Popup(string title, cv::Rect2i r, string content) : z::Window{title, r}
@@ -152,15 +158,33 @@ bool z::Popup::open()
 
 void z::Popup::click_yes(int, int)
 {
-	first_ = result_ = true;
-	closed_ = true;
-	cv::destroyWindow(title_);
+	closed_ = first_ = result_ = true;
+	quit();
 }
 
 void z::Popup::click_no(int, int)
 {
-	first_ = true;
 	result_ = false; 
-	closed_ = true;
-	cv::destroyWindow(title_);
+	closed_ = first_ = true;//closed first to avoid mutex
+	quit();
+}
+
+z::CheckBox::CheckBox(string text, cv::Rect2i r) : z::Widget{r}
+{
+	using namespace std::placeholders;
+	mat_ = cv::Vec3b{100, 100, 100};
+	inner_rect_ = cv::Rect2i{cv::Point2i{5, 5}, cv::Point2i{width-5, height-5}};
+	cv::rectangle(mat_, inner_rect_, cv::Scalar{200, 200, 200}, -1);
+	gui_callback_[cv::EVENT_LBUTTONUP] = bind(&CheckBox::click, this, _1, _2);
+}
+
+void z::CheckBox::click(int, int) 
+{
+	cv::rectangle(mat_, inner_rect_, checked_ ? cv::Scalar{200, 200, 200} : cv::Scalar{0, 255, 0}, -1);
+	checked_ = !checked_;
+}
+
+bool z::CheckBox::checked()
+{
+	return checked_;
 }

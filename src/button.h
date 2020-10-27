@@ -41,6 +41,19 @@ private:
 	const cv::Vec3b click_color{185, 180, 180};
 };
 
+class CheckBox : public Widget
+{
+public:
+	CheckBox(std::string text, cv::Rect2i r);
+	bool checked();
+protected:
+	std::string text_;
+	bool checked_ = false;
+private:
+	void click(int, int);
+	cv::Rect2i inner_rect_;
+};
+
 class Window : public Widget
 {
 public:
@@ -48,6 +61,7 @@ public:
 	void show();
 	void add(Widget &w);
 	std::vector<Widget*>::iterator begin(), end();
+	void quit();
 
 protected:
 	std::string title_;
@@ -60,7 +74,6 @@ class Popup : public Window
 public:
 	Popup(std::string title, cv::Rect2i r, std::string content);
 	bool open();
-	bool result();
 protected:
 	Button yes_{"Yes", {30, 100, 50, 30}}, no_{"No", {100, 100, 50, 30}};
 private:

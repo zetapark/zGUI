@@ -110,8 +110,8 @@ int main()
     /// show the image
 		//cv::setWindowProperty("ImageDisplay", cv::WND_PROP_AUTOSIZE, cv::WINDOW_NORMAL);
 		//cv::setWindowProperty("ImageDisplay", cv::WND_PROP_ASPECT_RATIO, cv::WINDOW_KEEPRATIO);
-		zeta::Widget w{{700, 200, 100, 100}};
-		zeta::Button b{{100, 100, 50, 20}};
+		z::Widget w{{700, 200, 100, 100}};
+		//zeta::Button b{{100, 100, 50, 20}};
 		cv::Mat mat = cv::imread("/home/zeta/Pictures/11.jpg");
     cv::imshow(TITLE, mat);
   

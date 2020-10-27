@@ -3,7 +3,7 @@ OBJ = $(wildcard *.o)
 TOBJ = $(wildcard *.t)
 EXE = $(patsubst %.x, ../%.x, $(wildcard *.x))
 LDFLAGS = 
-LDLIBS = $(shell pkg-config opencv4 --libs)
+LDLIBS = $(shell pkg-config opencv4 --libs) -pthread
 
 
 all : $(EXE) ../catch

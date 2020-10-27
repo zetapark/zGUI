@@ -1,33 +1,47 @@
+#include<thread>
+#include<mutex>
+#include<condition_variable>
 #include<map>
 #include<functional>
 #include <opencv2/highgui.hpp>
 #define EVENT_ENTER 8000
 #define EVENT_LEAVE 8001
 
-namespace zeta {
+namespace z {
 
 class Widget : public cv::Rect_<int>
 {//base class for all widgets
 public:
 	Widget(cv::Rect_<int> r);
 	bool is_updated();
-	void register_callback(int event, std::function<void(int,int)> f);
+	//void register_callback(int event, std::function<void(int,int)> f);
 	void operator>>(Widget &r);//copy widget to window
 	bool focus();
 	void focus(bool);
 	std::map<int, std::function<void(int, int)>> gui_callback_;//int : event, x, y
 	std::map<int, std::function<void(int, int)>> user_callback_;
+	cv::Mat3b mat_;//widget shape
 
 protected:
-	cv::Mat3b mat_;//widget shape
 	bool focus_ = false;
 };
 
 class Button : public Widget
 {
 public:
-	Button(cv::Rect_<int> r);
-	void click(auto func);
+	Button(std::string text, cv::Rect_<int> r);
+	void click(std::function<void(int, int)> f);
+protected:
+	std::string text_;
+private:
+	void leave(int, int);
+	void enter(int, int);
+	void ldown(int, int);
+	void lup(int, int);
+	void label();
+	const cv::Vec3b base_color{220, 220, 220};
+	const cv::Vec3b hover_color{255, 255, 255};
+	const cv::Vec3b click_color{185, 180, 180};
 };
 
 class Window : public Widget
@@ -40,7 +54,23 @@ public:
 
 protected:
 	std::string title_;
+	bool first_ = true;
 	std::vector<Widget*> widgets_;
+};
+
+class Popup : public Window
+{
+public:
+	Popup(std::string title, cv::Rect2i r, std::string content);
+	bool open();
+	bool result();
+protected:
+	Button yes_{"Yes", {30, 100, 50, 30}}, no_{"No", {100, 100, 50, 30}};
+private:
+	std::condition_variable cv_;
+	std::mutex mtx_;
+	bool closed_ = false, result_;
+	void click_yes(int, int), click_no(int, int);
 };
 
 }

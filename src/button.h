@@ -21,6 +21,7 @@ public:
 
 protected:
 	bool focus_ = false;
+	static const cv::Vec3b background_color_;
 };
 
 class Button : public Widget
@@ -97,6 +98,27 @@ public:
 	std::string value();
 protected:
 	std::string value_;
+private:
+	void key_event(int key, int);
+	const cv::Vec3b white = cv::Vec3b{255, 255, 255};
+};
+
+class Slider : public Widget
+{
+public:
+	Slider(cv::Rect2i r, int start, int stop, int step);
+	int value();
+	void value(int);
+protected:
+	int value_, start_, end_, step_, logical_length_, physical_length_;
+	bool hold_ = false;
+private:
+	void key_event(int key, int);
+	void move(int x, int y);
+	void ldown(int x, int y);
+	void lup(int x, int y);
+	void draw();
+	int to_pos(int val), to_val(int pos);
 };
 
 }

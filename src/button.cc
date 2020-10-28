@@ -3,9 +3,11 @@
 using namespace std;
 using namespace placeholders;
 
+const cv::Vec3b z::Widget::background_color_ = cv::Vec3b{200, 200, 200};
+
 z::Widget::Widget(cv::Rect_<int> r)
 	: Rect_<int>{r}
-	, mat_(r.height, r.width, cv::Vec3b{200, 200, 200})
+	, mat_(r.height, r.width, background_color_)
 { }
 
 bool z::Widget::focus() {
@@ -76,16 +78,22 @@ void mouse_callback(int event, int x, int y, int flags, void *ptr)
 	if(!pw) return;
 
 	if(event == cv::EVENT_MOUSEMOVE) {
-		if(!pw->focus() && pw->gui_callback_.find(EVENT_ENTER) != pw->gui_callback_.end()) {
-			pw->gui_callback_[EVENT_ENTER](x, y);
-			*p << *pw;
-			p->show();
+		if(!pw->focus()) {
 			pw->focus(true);
-		} 
-		if(!pw->focus() && pw->user_callback_.find(EVENT_ENTER) != pw->user_callback_.end()) {
-			pw->user_callback_[EVENT_ENTER](x, y);
-			pw->focus(true);
-		} 
+			if(pw->gui_callback_.find(EVENT_ENTER) != pw->gui_callback_.end()) {
+				pw->gui_callback_[EVENT_ENTER](x, y);
+				*p << *pw;
+				p->show();
+			} 
+			if(pw->user_callback_.find(EVENT_ENTER) != pw->user_callback_.end())
+				pw->user_callback_[EVENT_ENTER](x, y);
+		} else {
+			if(pw->gui_callback_.find(event) != pw->gui_callback_.end()) {
+				pw->gui_callback_[event](x, y);
+				*p << *pw;
+				p->show();
+			}
+		}
 	} else {
 		if(pw->gui_callback_.find(event) != pw->gui_callback_.end()) {
 			pw->gui_callback_[event](x, y);
@@ -139,8 +147,11 @@ int z::Window::loop()
 {
 	for(int key; (key = cv::waitKey()) != -1;) {//destroy window make waitkey return -1
 		for(z::Widget* p : *this)
-			if(p->focus() && p->gui_callback_.find(EVENT_KEYBOARD) != p->gui_callback_.end())
+			if(p->focus() && p->gui_callback_.find(EVENT_KEYBOARD) != p->gui_callback_.end()) {
 				p->gui_callback_[EVENT_KEYBOARD](key, 0);
+				*this << *p;
+				show();
+			}
 	}
 	return 0;
 }
@@ -206,5 +217,89 @@ cv::Mat &z::Image::operator=(const cv::Mat &r)
 
 z::TextInput::TextInput(cv::Rect2i r) : z::Widget{r}
 {
-	mat_ = cv::Vec3b{255, 255, 255};
+	mat_ = white;
+	gui_callback_[EVENT_KEYBOARD] = bind(&z::TextInput::key_event, this, _1, _2);
+}
+
+void z::TextInput::key_event(int key, int)
+{
+	if(key == 8) value_.pop_back();
+	else value_ += key;
+	cout << key << endl;
+	mat_ = white;
+	cv::putText(mat_, value_, {10, 20}, 0, .7, {0,0,0}, 2);
+}
+
+string z::TextInput::value()
+{
+	return value_;
+}
+
+z::Slider::Slider(cv::Rect2i r, int start, int end, int step) : z::Widget{r}
+{
+	start_ = start; end_ = end; step_ = step;
+	value_ = (end - start) / 2;
+	logical_length_ = end_ - start_;
+	physical_length_ = width - 20;
+	draw();
+	gui_callback_[cv::EVENT_LBUTTONUP] = bind(&z::Slider::lup, this, _1, _2);
+	gui_callback_[cv::EVENT_LBUTTONDOWN] = bind(&z::Slider::ldown, this, _1, _2);
+	gui_callback_[cv::EVENT_MOUSEMOVE] = bind(&z::Slider::move, this, _1, _2);
+	gui_callback_[EVENT_KEYBOARD] = bind(&z::Slider::key_event, this, _1, _2);
+}
+
+void z::Slider::draw()
+{
+	mat_ = background_color_;
+	cv::line(mat_, {10, height / 2}, {width - 11, height / 2}, {100, 100, 100});
+	cv::circle(mat_, {to_pos(value_), height / 2}, 10, {230, 230, 230}, -1);
+}
+
+int z::Slider::to_pos(int val)
+{
+	return (val - start_) * physical_length_ / logical_length_ + 10;
+}
+int z::Slider::to_val(int pos)
+{
+	return (pos - 10) * logical_length_ / physical_length_ + start_;
+}
+
+void z::Slider::value(int v)
+{
+	value_ = v;
+}
+
+int z::Slider::value()
+{
+	return value_;
+}
+
+void z::Slider::ldown(int x, int y)
+{
+	int pos = to_pos(value_);
+	if(pos - 10 < x - this->x && x - this->x < pos + 10) hold_ = true;
+}
+
+void z::Slider::move(int x, int y)
+{
+	if(hold_) {
+		value(to_val(x - this->x));
+		draw();
+	}
+}
+
+void z::Slider::lup(int x, int y)
+{
+	if(hold_) hold_ = false;
+	else {
+		value(to_val(x - this->x));
+		draw();
+	}
+}
+
+void z::Slider::key_event(int key, int)
+{
+	if(key == 81) value_ -= step_;//left arrow key
+	else if(key == 83) value_ += step_;//right arrow key
+	draw();
 }

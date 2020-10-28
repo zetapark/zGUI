@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #define EVENT_ENTER 8000
 #define EVENT_LEAVE 8001
+#define EVENT_KEYBOARD 8002
 
 namespace z {
 
@@ -12,7 +13,6 @@ public:
 	Widget(cv::Rect_<int> r);
 	bool is_updated();
 	//void register_callback(int event, std::function<void(int,int)> f);
-	void operator>>(Widget &r);//copy widget to window
 	bool focus();
 	void focus(bool);
 	std::map<int, std::function<void(int, int)>> gui_callback_;//int : event, x, y
@@ -60,6 +60,8 @@ public:
 	Window(std::string title, cv::Rect_<int> r);
 	void show();
 	void operator+=(Widget &w);
+	void operator<<(Widget &r);
+	int loop();
 	std::vector<Widget*>::iterator begin(), end();
 	void quit();
 
@@ -77,7 +79,7 @@ public:
 protected:
 	Button yes_{"Yes", {30, 100, 50, 30}}, no_{"No", {100, 100, 50, 30}};
 private:
-	bool closed_ = false, result_;
+	bool closed_ = false, result_ = false;
 	void click_yes(int, int), click_no(int, int);
 };
 
@@ -87,4 +89,14 @@ public:
 	Image(cv::Rect2i r);
 	cv::Mat &operator=(const cv::Mat &r);
 };
+
+class TextInput : public Widget
+{
+public:
+	TextInput(cv::Rect2i r);
+	std::string value();
+protected:
+	std::string value_;
+};
+
 }

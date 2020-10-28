@@ -1,18 +1,12 @@
 #include<opencv2/opencv.hpp>
 #include"button.h"
 using namespace std;
+using namespace placeholders;
 
 z::Widget::Widget(cv::Rect_<int> r)
 	: Rect_<int>{r}
-	, mat_(r.height, r.width)
-{
-	mat_ = cv::Vec3b{200, 200, 200};
-}
-
-void z::Widget::operator>>(z::Widget &r)
-{
-	mat_.copyTo(r.mat_(*this));
-}
+	, mat_(r.height, r.width, cv::Vec3b{200, 200, 200})
+{ }
 
 bool z::Widget::focus() {
 	return focus_;
@@ -23,7 +17,6 @@ void z::Widget::focus(bool tf) {
 
 z::Button::Button(string text, cv::Rect_<int> r) : z::Widget{r}
 {
-	using namespace placeholders;
 	text_ = text;
 	mat_ = base_color;
 	//mat_(cv::Rect2i{4, 4, this->width - 8, this->height - 8}) = base_color;
@@ -72,7 +65,7 @@ void mouse_callback(int event, int x, int y, int flags, void *ptr)
 		else if(w->focus()) {
 			if(w->gui_callback_.find(EVENT_LEAVE) != w->gui_callback_.end()) {
 				w->gui_callback_[EVENT_LEAVE](x, y);
-				*w >> *p;
+				*p << *w;
 				p->show();
 			}
 			if(w->user_callback_.find(EVENT_LEAVE) != w->user_callback_.end())
@@ -85,7 +78,7 @@ void mouse_callback(int event, int x, int y, int flags, void *ptr)
 	if(event == cv::EVENT_MOUSEMOVE) {
 		if(!pw->focus() && pw->gui_callback_.find(EVENT_ENTER) != pw->gui_callback_.end()) {
 			pw->gui_callback_[EVENT_ENTER](x, y);
-			*pw >> *p;
+			*p << *pw;
 			p->show();
 			pw->focus(true);
 		} 
@@ -96,7 +89,7 @@ void mouse_callback(int event, int x, int y, int flags, void *ptr)
 	} else {
 		if(pw->gui_callback_.find(event) != pw->gui_callback_.end()) {
 			pw->gui_callback_[event](x, y);
-			*pw >> *p;
+			*p << *pw;
 			p->show();
 		}
 		if(pw->user_callback_.find(event) != pw->user_callback_.end())
@@ -119,7 +112,12 @@ vector<z::Widget*>::iterator z::Window::end() {
 void z::Window::operator+=(z::Widget &w)
 {
 	widgets_.push_back(&w);
-	w >> *this;
+	*this << w;
+}
+
+void z::Window::operator<<(z::Widget &r)
+{
+	r.mat_.copyTo(mat_(r));
 }
 
 void z::Window::show()
@@ -137,9 +135,18 @@ void z::Window::quit()
 	cv::destroyWindow(title_);
 }
 
+int z::Window::loop()
+{
+	for(int key; (key = cv::waitKey()) != -1;) {//destroy window make waitkey return -1
+		for(z::Widget* p : *this)
+			if(p->focus() && p->gui_callback_.find(EVENT_KEYBOARD) != p->gui_callback_.end())
+				p->gui_callback_[EVENT_KEYBOARD](key, 0);
+	}
+	return 0;
+}
+
 z::Popup::Popup(string title, cv::Rect2i r, string content) : z::Window{title, r}
 {
-	using namespace std::placeholders;
 	title_ = title;
 	*this += yes_;
 	*this += no_;
@@ -171,7 +178,6 @@ void z::Popup::click_no(int, int)
 
 z::CheckBox::CheckBox(string text, cv::Rect2i r) : z::Widget{r}
 {
-	using namespace std::placeholders;
 	mat_ = cv::Vec3b{100, 100, 100};
 	inner_rect_ = cv::Rect2i{cv::Point2i{5, 5}, cv::Point2i{width-5, height-5}};
 	cv::rectangle(mat_, inner_rect_, cv::Scalar{200, 200, 200}, -1);
@@ -196,4 +202,9 @@ cv::Mat &z::Image::operator=(const cv::Mat &r)
 {
 	mat_ = r({0, 0, min(r.cols, width), min(r.rows, height)});
 	return mat_;
+}
+
+z::TextInput::TextInput(cv::Rect2i r) : z::Widget{r}
+{
+	mat_ = cv::Vec3b{255, 255, 255};
 }

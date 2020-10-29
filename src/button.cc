@@ -3,12 +3,14 @@
 using namespace std;
 using namespace placeholders;
 
-const cv::Vec3b z::Widget::background_color_ = cv::Vec3b{200, 200, 200};
+//const cv::Vec3b z::Widget::background_color_ = cv::Vec3b{200, 200, 200};
 
 z::Widget::Widget(cv::Rect_<int> r)
 	: Rect_<int>{r}
-	, mat_(r.height, r.width, background_color_)
-{ }
+	, mat_(r.height, r.width)
+{
+	mat_ = background_color_;
+}
 
 bool z::Widget::focus() {
 	return focus_;
@@ -117,15 +119,17 @@ vector<z::Widget*>::iterator z::Window::end() {
 	return widgets_.end();
 }
 
-void z::Window::operator+=(z::Widget &w)
+z::Window& z::Window::operator+(z::Widget &w)
 {
 	widgets_.push_back(&w);
 	*this << w;
+	return *this;
 }
 
-void z::Window::operator<<(z::Widget &r)
+z::Window& z::Window::operator<<(z::Widget &r)
 {
 	r.mat_.copyTo(mat_(r));
+	return *this;
 }
 
 void z::Window::show()
@@ -159,8 +163,7 @@ int z::Window::loop()
 z::Popup::Popup(string title, cv::Rect2i r, string content) : z::Window{title, r}
 {
 	title_ = title;
-	*this += yes_;
-	*this += no_;
+	*this + yes_ + no_;
 	cv::putText(mat_, content, {10, 30}, 0, 0.7, {0, 0, 0});
 	yes_.click(bind(&Popup::click_yes, this, _1, _2));
 	no_.click(bind(&Popup::click_no, this, _1, _2));
@@ -223,11 +226,17 @@ z::TextInput::TextInput(cv::Rect2i r) : z::Widget{r}
 
 void z::TextInput::key_event(int key, int)
 {
+	if(key == 13) return user_callback_[EVENT_KEYBOARD](0, 0);
 	if(key == 8) value_.pop_back();
 	else value_ += key;
 	cout << key << endl;
 	mat_ = white;
 	cv::putText(mat_, value_, {10, 20}, 0, .7, {0,0,0}, 2);
+}
+
+void z::TextInput::enter(function<void(int, int)> f)
+{
+	user_callback_[EVENT_KEYBOARD] = f;
 }
 
 string z::TextInput::value()
@@ -238,7 +247,7 @@ string z::TextInput::value()
 z::Slider::Slider(cv::Rect2i r, int start, int end, int step) : z::Widget{r}
 {
 	start_ = start; end_ = end; step_ = step;
-	value_ = (end - start) / 2;
+	value((end - start) / 2);
 	logical_length_ = end_ - start_;
 	physical_length_ = width - 20;
 	draw();
@@ -266,7 +275,9 @@ int z::Slider::to_val(int pos)
 
 void z::Slider::value(int v)
 {
-	value_ = v;
+	if(v < start_) value_ = start_;
+	else if(v > end_) value_ = end_;
+	else value_ = v;
 }
 
 int z::Slider::value()
@@ -299,7 +310,16 @@ void z::Slider::lup(int x, int y)
 
 void z::Slider::key_event(int key, int)
 {
-	if(key == 81) value_ -= step_;//left arrow key
-	else if(key == 83) value_ += step_;//right arrow key
+	switch(key) {
+		case 81: value(value_ - step_); break;//left arrow key
+		case 83: value(value_ + step_); break;//right arrow key
+		case 82: value(value_ - 10 * step_); break;//up arrow key
+		case 84: value(value_ + 10 * step_); break;//down 
+	}
 	draw();
+}
+
+void z::Slider::on_change(function<void(int, int)> f)
+{
+	user_callback_[cv::EVENT_LBUTTONDOWN] = f;
 }

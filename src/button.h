@@ -21,7 +21,7 @@ public:
 
 protected:
 	bool focus_ = false;
-	static const cv::Vec3b background_color_;
+	const cv::Vec3b background_color_ = cv::Vec3b{200, 200, 200};
 };
 
 class Button : public Widget
@@ -60,8 +60,8 @@ class Window : public Widget
 public:
 	Window(std::string title, cv::Rect_<int> r);
 	void show();
-	void operator+=(Widget &w);
-	void operator<<(Widget &r);
+	Window &operator+(Widget &w);
+	Window &operator<<(Widget &r);
 	int loop();
 	std::vector<Widget*>::iterator begin(), end();
 	void quit();
@@ -96,6 +96,7 @@ class TextInput : public Widget
 public:
 	TextInput(cv::Rect2i r);
 	std::string value();
+	void enter(std::function<void(int, int)> f);
 protected:
 	std::string value_;
 private:
@@ -109,6 +110,7 @@ public:
 	Slider(cv::Rect2i r, int start, int stop, int step);
 	int value();
 	void value(int);
+	void on_change(std::function<void(int, int)> f);//front int = value, second int = discard
 protected:
 	int value_, start_, end_, step_, logical_length_, physical_length_;
 	bool hold_ = false;

@@ -82,7 +82,6 @@ protected:
 	std::string title_;
 	bool first_ = true;
 	std::vector<Widget*> widgets_;
-private:
 	std::mutex mtx_;
 };
 

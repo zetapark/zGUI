@@ -68,7 +68,7 @@ z::Window& z::Window::operator+(z::Widget &w)
 
 z::Window& z::Window::operator<<(z::Widget &r)
 {
-	//lock_guard<mutex> lck{mtx_};
+	lock_guard<mutex> lck{mtx_};
 	r.mat_.copyTo(mat_(r));
 	show();
 	return *this;

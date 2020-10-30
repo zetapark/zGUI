@@ -1,7 +1,6 @@
+#include<mutex>
 #include<thread>
 #include<CvPlot/imp/cvplot.ipp>
-#define CVUI_IMPLEMENTATION
-#include<CvPlot/cvui.h>
 #include<iostream>
 #include<opencv2/imgproc.hpp>
 #include"button.h"
@@ -24,7 +23,7 @@ protected:
 class Win : public z::Window
 {
 public:
-	Win(string title, cv::Rect2i r) : z::Window{title, r}, th_{&Win::run, this} {
+	Win(string title, cv::Rect2i r) : z::Window{title, r} {
 		input_.enter([](string s){cout << s << endl;});
 		popup_.click([this]() {cout << (pop_win_.open() ? "yes" : "no") << endl;});
 		quit_.click([this](){quit();});
@@ -35,6 +34,7 @@ public:
 		});
 		chk_.on_change([this](bool checked) { lb_.text(checked ? "green" : "blue"); *this << lb_; });
 		*this + popup_ + quit_ + click_ + chk_ + input_ + img_ + sl_ + lb_;
+		th_ = std::thread{&Win::run, this};//to avoid mutex
 	}
 	~Win() {
 		run_ = false;

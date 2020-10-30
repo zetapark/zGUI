@@ -8,13 +8,18 @@ class Win : public z::Window
 {
 public:
 	Win(string title, cv::Rect2i r) : z::Window{title, r} {
-		cv::Mat mat = cv::imread("/home/zeta/Pictures/11.jpg");
-		cv::resize(mat, mat, {200, 200});
+		cv::Mat mat = cv::imread("/home/zeta/Pictures/11.jpg"), mat2;
+		cv::resize(mat, mat2, {200, 200});
 		img_ = mat;
 		input_.enter([this](int, int){cout << this->input_.value() << endl;});
 		popup_.click([this](int, int) {cout << (this->pop_win_.open() ? "yes" : "no") << endl;});
 		quit_.click([this](int, int){this->quit();});
-		sl_.on_change([](int val, int) { cout << val << endl; });
+		sl_.on_change([&](int val, int) { cout << val << endl;
+				mat2 = mat(cv::Rect2i{val, val, 200, 200});
+				img_ = mat2;
+				*this << img_;
+				show();
+				});
 		*this + popup_ + quit_ + click_ + chk_ + input_ + img_ + sl_;
 	}
 protected:

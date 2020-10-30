@@ -81,5 +81,8 @@ void z::Slider::key_event(int key, int)
 
 void z::Slider::on_change(function<void(int)> f)
 {
-	on_change_ = f;
+	user_callback_[cv::EVENT_LBUTTONDOWN] = [this](int, int) {user_hold_ = true;};
+	user_callback_[cv::EVENT_MOUSEMOVE] = [this, f](int, int) { if(user_hold_) f(value()); };
+	user_callback_[cv::EVENT_LBUTTONUP] = [this, f](int, int) { f(value()); user_hold_ = false; };
+	//on_change_ = f;
 }

@@ -3,12 +3,12 @@
 using namespace std;
 
 void mouse_callback(int event, int x, int y, int flags, void *ptr)
-{
+{//get mouse event
 	z::Window *p = (z::Window*)ptr;
 	z::Widget *pw = nullptr;
 	for(auto w : *p) {
-		if(w->contains({x, y})) { pw = w; }
-		else if(w->focus()) {
+		if(w->contains({x, y})) pw = w;//set 
+		else if(w->focus()) {//leave event
 			if(w->gui_callback_.find(EVENT_LEAVE) != w->gui_callback_.end()) {
 				w->gui_callback_[EVENT_LEAVE](x, y);
 				*p << *w;
@@ -21,7 +21,7 @@ void mouse_callback(int event, int x, int y, int flags, void *ptr)
 	if(!pw) return;
 
 	if(event == cv::EVENT_MOUSEMOVE) {
-		if(!pw->focus()) {
+		if(!pw->focus()) {//enter event
 			pw->focus(true);
 			if(pw->gui_callback_.find(EVENT_ENTER) != pw->gui_callback_.end()) {
 				pw->gui_callback_[EVENT_ENTER](x, y);
@@ -29,13 +29,15 @@ void mouse_callback(int event, int x, int y, int flags, void *ptr)
 			} 
 			if(pw->user_callback_.find(EVENT_ENTER) != pw->user_callback_.end())
 				pw->user_callback_[EVENT_ENTER](x, y);
-		} else {
+		} else {//move event
 			if(pw->gui_callback_.find(event) != pw->gui_callback_.end()) {
 				pw->gui_callback_[event](x, y);
 				*p << *pw;
 			}
+			if(pw->user_callback_.find(event) != pw->user_callback_.end())
+				pw->user_callback_[event](x, y);
 		}
-	} else {
+	} else {//all other event
 		if(pw->gui_callback_.find(event) != pw->gui_callback_.end()) {
 			pw->gui_callback_[event](x, y);
 			*p << *pw;
@@ -88,7 +90,7 @@ void z::Window::quit()
 }
 
 int z::Window::loop()
-{//get keyboard interrupt
+{//get keyboard event
 	for(int key; (key = cv::waitKey()) != -1;) {//destroy window make waitkey return -1
 		for(z::Widget* p : *this) if(p->focus()) {
 			if(p->gui_callback_.find(EVENT_KEYBOARD) != p->gui_callback_.end()) {

@@ -10,11 +10,11 @@ public:
 	Win(string title, cv::Rect2i r) : z::Window{title, r} {
 		mat2_ = cv::imread("/home/zeta/Pictures/11.jpg");
 		//cv::resize(mat, mat2, {200, 200});
-		input_.enter([](){cout << "hello" << endl;});
-		popup_.click([this]() {cout << (this->pop_win_.open() ? "yes" : "no") << endl;});
-		quit_.click([this](){this->quit();});
-		sl_.user_callback_[EVENT_KEYBOARD] = ( [&](int, int) { 
-				img_ = mat2_(cv::Rect2i{sl_.value(), 0, 200, 200}); 
+		input_.enter([this](){cout << input_.value() << endl;});
+		popup_.click([this]() {cout << (pop_win_.open() ? "yes" : "no") << endl;});
+		quit_.click([this](){quit();});
+		sl_.on_change( [this](int val) { 
+				img_ = mat2_(cv::Rect2i{val, 0, 200, 200}); 
 				*this << img_;
 			});
 //		sl_.on_change([&](int val) { cout << val << endl;

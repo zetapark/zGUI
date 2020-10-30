@@ -125,6 +125,7 @@ private:
 	void lup(int x, int y);
 	void draw();
 	int to_pos(int val), to_val(int pos);
+	bool user_hold_ = false;
 };
 
 }

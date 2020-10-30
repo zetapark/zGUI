@@ -11,16 +11,17 @@ z::TextInput::TextInput(cv::Rect2i r) : z::Widget{r}
 
 void z::TextInput::key_event(int key, int)
 {
-	if(key == 13) return user_callback_[EVENT_KEYBOARD](0, 0);
-	if(key == 8) value_.pop_back();
-	else value_ += key;
+	//if(key == 13) return user_callback_[EVENT_KEYBOARD](0, 0);
+	if(key == 8 && !value_.empty()) value_.pop_back();
+	else if(key >= 0x20 && key <= 0x7e) value_ += key;
+	else return;
 	mat_ = white;
-	cv::putText(mat_, value_, {10, 20}, 0, .7, {0,0,0}, 2);
+	cv::putText(mat_, value_, {0, 20}, 0, .7, {0,0,0}, 2);
 }
 
 void z::TextInput::enter(function<void(string)> f)
 {
-	user_callback_[EVENT_KEYBOARD] = [this, f](int, int){f(value());};
+	user_callback_[EVENT_KEYBOARD] = [this, f](int val, int){ if(val == 13) f(value());};
 }
 
 string z::TextInput::value()

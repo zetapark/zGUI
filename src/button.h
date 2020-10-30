@@ -25,6 +25,16 @@ protected:
 	const cv::Vec3b background_color_ = cv::Vec3b{200, 200, 200};
 };
 
+class Label : public Widget
+{
+public:
+	Label(std::string text, cv::Rect2i r);
+	void text(std::string s);
+	std::string text();
+protected:
+	std::string text_;
+};
+
 class Button : public Widget
 {
 public:

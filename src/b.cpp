@@ -8,21 +8,26 @@ class Win : public z::Window
 {
 public:
 	Win(string title, cv::Rect2i r) : z::Window{title, r} {
-		cv::Mat mat = cv::imread("/home/zeta/Pictures/11.jpg"), mat2;
-		cv::resize(mat, mat2, {200, 200});
-		img_ = mat;
-		input_.enter([this](int, int){cout << this->input_.value() << endl;});
-		popup_.click([this](int, int) {cout << (this->pop_win_.open() ? "yes" : "no") << endl;});
-		quit_.click([this](int, int){this->quit();});
-		sl_.on_change([&](int val, int) { cout << val << endl;
-				mat2 = mat(cv::Rect2i{val, val, 200, 200});
-				img_ = mat2;
+		mat2_ = cv::imread("/home/zeta/Pictures/11.jpg");
+		//cv::resize(mat, mat2, {200, 200});
+		input_.enter([](){cout << "hello" << endl;});
+		popup_.click([this]() {cout << (this->pop_win_.open() ? "yes" : "no") << endl;});
+		quit_.click([this](){this->quit();});
+		sl_.user_callback_[EVENT_KEYBOARD] = ( [&](int, int) { 
+				img_ = mat2_(cv::Rect2i{sl_.value(), 0, 200, 200}); 
 				*this << img_;
-				show();
-				});
+			});
+//		sl_.on_change([&](int val) { cout << val << endl;
+//				cv::Mat mat3 = cv::imread("/home/zeta/Pictures/11.jpg"), mat2;
+//				mat2 = mat3(cv::Rect2i{val, val, 200, 200});
+//				img_ = mat2;
+//				*this << img_;
+//				show();
+//				});
 		*this + popup_ + quit_ + click_ + chk_ + input_ + img_ + sl_;
 	}
 protected:
+	cv::Mat mat2_;
 	z::Popup pop_win_{"yes no", {0, 0, 300, 300}, "What do you want?"};
 	z::Button popup_{"Popup", {100, 100, 90, 30}}, quit_{"Quit", {200, 100, 80, 30}},
 		click_{"click", {300, 100, 90, 30}};

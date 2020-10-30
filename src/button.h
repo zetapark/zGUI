@@ -1,3 +1,4 @@
+#include<mutex>
 #include<map>
 #include<functional>
 #include <opencv2/highgui.hpp>
@@ -28,7 +29,7 @@ class Button : public Widget
 {
 public:
 	Button(std::string text, cv::Rect_<int> r);
-	void click(std::function<void(int, int)> f);
+	void click(std::function<void()> f);
 protected:
 	std::string text_;
 private:
@@ -70,6 +71,8 @@ protected:
 	std::string title_;
 	bool first_ = true;
 	std::vector<Widget*> widgets_;
+private:
+	std::mutex mtx_;
 };
 
 class Popup : public Window
@@ -81,7 +84,7 @@ protected:
 	Button yes_{"Yes", {30, 100, 50, 30}}, no_{"No", {100, 100, 50, 30}};
 private:
 	bool closed_ = false, result_ = false;
-	void click_yes(int, int), click_no(int, int);
+	void click_yes(), click_no();
 };
 
 class Image : public Widget
@@ -96,7 +99,7 @@ class TextInput : public Widget
 public:
 	TextInput(cv::Rect2i r);
 	std::string value();
-	void enter(std::function<void(int, int)> f);
+	void enter(std::function<void()> f);
 protected:
 	std::string value_;
 private:
@@ -110,11 +113,12 @@ public:
 	Slider(cv::Rect2i r, int start, int stop, int step);
 	int value();
 	void value(int);
-	void on_change(std::function<void(int, int)> f);//front int = value, second int = discard
+	void on_change(std::function<void(int)> f);//front int = value, second int = discard
 protected:
 	int value_, start_, end_, step_, logical_length_, physical_length_;
 	bool hold_ = false;
 private:
+	std::function<void(int)> on_change_;
 	void key_event(int key, int);
 	void move(int x, int y);
 	void ldown(int x, int y);

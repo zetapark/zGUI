@@ -22,3 +22,8 @@ bool z::CheckBox::checked()
 	return checked_;
 }
 
+void z::CheckBox::on_change(function<void(bool)> f)
+{
+	user_callback_[cv::EVENT_LBUTTONUP] = [this, f](int,int) { f(checked()); };
+}
+

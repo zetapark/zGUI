@@ -48,6 +48,7 @@ class CheckBox : public Widget
 public:
 	CheckBox(std::string text, cv::Rect2i r);
 	bool checked();
+	void on_change(std::function<void(bool)> f);
 protected:
 	std::string text_;
 	bool checked_ = false;
@@ -99,7 +100,7 @@ class TextInput : public Widget
 public:
 	TextInput(cv::Rect2i r);
 	std::string value();
-	void enter(std::function<void()> f);
+	void enter(std::function<void(std::string)> f);
 protected:
 	std::string value_;
 private:

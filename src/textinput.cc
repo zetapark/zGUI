@@ -14,14 +14,13 @@ void z::TextInput::key_event(int key, int)
 	if(key == 13) return user_callback_[EVENT_KEYBOARD](0, 0);
 	if(key == 8) value_.pop_back();
 	else value_ += key;
-	cout << key << endl;
 	mat_ = white;
 	cv::putText(mat_, value_, {10, 20}, 0, .7, {0,0,0}, 2);
 }
 
-void z::TextInput::enter(function<void()> f)
+void z::TextInput::enter(function<void(string)> f)
 {
-	user_callback_[EVENT_KEYBOARD] = [f](int, int){f();};
+	user_callback_[EVENT_KEYBOARD] = [this, f](int, int){f(value());};
 }
 
 string z::TextInput::value()

@@ -10,13 +10,14 @@ public:
 	Win(string title, cv::Rect2i r) : z::Window{title, r} {
 		mat2_ = cv::imread("/home/zeta/Pictures/11.jpg");
 		//cv::resize(mat, mat2, {200, 200});
-		input_.enter([this](){cout << input_.value() << endl;});
+		input_.enter([](string s){cout << s << endl;});
 		popup_.click([this]() {cout << (pop_win_.open() ? "yes" : "no") << endl;});
 		quit_.click([this](){quit();});
 		sl_.on_change( [this](int val) { 
 				img_ = mat2_(cv::Rect2i{val, 0, 200, 200}); 
 				*this << img_;
 			});
+		chk_.on_change([this](bool checked) { cout << checked << endl; });
 //		sl_.on_change([&](int val) { cout << val << endl;
 //				cv::Mat mat3 = cv::imread("/home/zeta/Pictures/11.jpg"), mat2;
 //				mat2 = mat3(cv::Rect2i{val, val, 200, 200});

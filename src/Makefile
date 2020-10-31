@@ -1,5 +1,5 @@
 CXX = g++-10
-CPPFLAGS = -I../
+CPPFLAGS = -I../ -pthread
 CXXFLAGS = -g -c -std=c++20 -fmax-errors=1 $(shell pkg-config opencv4 --cflags)
 DIR = $(notdir $(shell pwd))
 OBJ = $(patsubst %.cc, ../obj/%.$(DIR).o, $(wildcard *.cc))

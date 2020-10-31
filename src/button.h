@@ -82,7 +82,7 @@ protected:
 	std::string title_;
 	bool first_ = true;
 	std::vector<Widget*> widgets_;
-	std::mutex mtx_;
+	//std::mutex mtx_;
 };
 
 class Popup : public Window

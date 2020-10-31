@@ -61,6 +61,7 @@ vector<z::Widget*>::iterator z::Window::end() {
 
 z::Window& z::Window::operator+(z::Widget &w)
 {
+	//lock_guard<mutex> lck{mtx_};
 	widgets_.push_back(&w);
 	w.mat_.copyTo(mat_(w));
 	return *this;
@@ -68,7 +69,7 @@ z::Window& z::Window::operator+(z::Widget &w)
 
 z::Window& z::Window::operator<<(z::Widget &r)
 {
-	lock_guard<mutex> lck{mtx_};
+	//lock_guard<mutex> lck{mtx_};
 	r.mat_.copyTo(mat_(r));
 	show();
 	return *this;

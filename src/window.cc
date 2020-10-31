@@ -77,11 +77,6 @@ z::Window& z::Window::operator<<(z::Widget &r)
 
 void z::Window::show()
 {
-	if(first_) {
-		cv::namedWindow(title_, 0);
-		cv::setMouseCallback(title_, mouse_callback, this);
-		first_ = false;
-	}
 	cv::imshow(title_, mat_);
 }
 
@@ -90,17 +85,23 @@ void z::Window::quit()
 	cv::destroyWindow(title_);
 }
 
+void z::Window::start()
+{
+	show();
+	cv::setMouseCallback(title_, mouse_callback, this);
+}
+
 int z::Window::loop()
 {//get keyboard event
+	start();
 	for(int key; (key = cv::waitKey()) != -1;) {//destroy window make waitkey return -1
 		for(z::Widget* p : *this) if(p->focus()) {
 			if(p->gui_callback_.find(EVENT_KEYBOARD) != p->gui_callback_.end()) {
 				p->gui_callback_[EVENT_KEYBOARD](key, 0);
 				*this << *p;
 			}
-			if(p->user_callback_.find(EVENT_KEYBOARD) != p->user_callback_.end()) {
+			if(p->user_callback_.find(EVENT_KEYBOARD) != p->user_callback_.end())
 				p->user_callback_[EVENT_KEYBOARD](key, 0);
-			}
 		}
 	}
 	return 0;

@@ -11,9 +11,9 @@ z::Popup::Popup(string title, cv::Rect2i r, string content) : z::Window{title, r
 	no_.click(bind(&Popup::click_no, this));
 }
 
-bool z::Popup::open()
+int z::Popup::open()
 {
-	show();
+	start();
 	while(!closed_) cv::waitKey(10);
 	closed_ = false;
 	return result_;
@@ -21,14 +21,15 @@ bool z::Popup::open()
 
 void z::Popup::click_yes()
 {
-	closed_ = first_ = result_ = true;
+	result_ = 1;
+	closed_ = true;
 	quit();
 }
 
 void z::Popup::click_no()
 {
-	result_ = false; 
-	closed_ = first_ = true;//closed first to avoid mutex
+	result_ = 0; 
+	closed_ = true;//closed first to avoid mutex
 	quit();
 }
 

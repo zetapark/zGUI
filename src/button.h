@@ -77,10 +77,10 @@ public:
 	int loop();
 	std::vector<Widget*>::iterator begin(), end();
 	void quit();
+	void start();
 
 protected:
 	std::string title_;
-	bool first_ = true;
 	std::vector<Widget*> widgets_;
 	//std::mutex mtx_;
 };
@@ -89,11 +89,12 @@ class Popup : public Window
 {
 public:
 	Popup(std::string title, cv::Rect2i r, std::string content);
-	bool open();
+	int open();
 protected:
 	Button yes_{"Yes", {30, 100, 50, 30}}, no_{"No", {100, 100, 50, 30}};
 private:
-	bool closed_ = false, result_ = false;
+	bool closed_ = false;
+	int result_ = 0;
 	void click_yes(), click_no();
 };
 

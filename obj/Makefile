@@ -1,8 +1,8 @@
-CXX = g++
+CXX = g++-10
 OBJ = $(wildcard *.o)
 TOBJ = $(wildcard *.t)
 EXE = $(patsubst %.x, ../%.x, $(wildcard *.x))
-LDFLAGS = 
+LDFLAGS =
 LDLIBS = $(shell pkg-config opencv4 --libs) -pthread
 
 

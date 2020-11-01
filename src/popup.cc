@@ -2,34 +2,23 @@
 #include"button.h"
 using namespace std;
 
-z::Popup::Popup(string title, cv::Rect2i r, string content) : z::Window{title, r}
+z::Popup::Popup(string title, cv::Rect2i r) : z::Window{title, r}
 {
 	title_ = title;
-	*this + yes_ + no_;
-	cv::putText(mat_, content, {10, 30}, 0, 0.7, {0, 0, 0});
-	yes_.click(bind(&Popup::click_yes, this));
-	no_.click(bind(&Popup::click_no, this));
 }
 
 int z::Popup::open()
 {
 	start();
-	while(!closed_) cv::waitKey(10);
+	while(!closed_) if(int key = cv::waitKey(10); key != -1) keyboard_callback(key);
 	closed_ = false;
 	return result_;
 }
 
-void z::Popup::click_yes()
+void z::Popup::quit(int r)
 {
-	result_ = 1;
+	result_ = r;
 	closed_ = true;
-	quit();
-}
-
-void z::Popup::click_no()
-{
-	result_ = 0; 
-	closed_ = true;//closed first to avoid mutex
-	quit();
+	close();
 }
 

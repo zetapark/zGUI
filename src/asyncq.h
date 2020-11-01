@@ -34,12 +34,48 @@ private:
 };
 
 template<class T, int N> class WQueue
-{
+{//for conveyer belt style workfolw
 public:
-	WQueue(std::function<void(T)> consumer);
-	void push_back(T s);
-protected:
-	std::array<T, N> buffer_;
+	WQueue(std::function<void(T)> consumer) : th_{&WQueue::run, this, consumer}
+	{ }
+	void push_back(T s) {
+		std::unique_lock<std::mutex> lck{mtx_};
+		while(full()) cv_.wait(lck);
+		buffer_[end_] = s;
+		increase(end_);
+		lck.unlock();
+		cv_.notify_one();
+	}
+	~WQueue() { 
+		run_ = false;
+		th_.join();
+	}
 
+protected:
+	std::thread th_;
+	std::array<T, N> buffer_;
+	int start_ = 0, end_ = 0;//valid [start_, end_)
+	bool run_ = true;
+	std::condition_variable_any cv_;
+	std::mutex mtx_;
+
+private:
+	bool full() { return end_ == start_ -1 || (start_ == 0 && end_ == N-1); }
+	bool empty() { return start_ == end_; }
+	void increase(int &i) { i++; if(i == N) i = 0; }
+	void run(std::function<void(T)> f) {
+		std::unique_lock<std::mutex> lck{mtx_, std::defer_lock};
+		while(run_) {
+			if(!empty()) {
+				f(buffer_[start_]);
+				increase(start_);
+				cv_.notify_all();
+			} else {
+				lck.lock();
+				while(empty()) cv_.wait(lck);
+				lck.unlock();
+			}
+		}
+	}
 };
 

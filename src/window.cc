@@ -80,29 +80,32 @@ void z::Window::show()
 	cv::imshow(title_, mat_);
 }
 
-void z::Window::quit()
+void z::Window::close()
 {
 	cv::destroyWindow(title_);
 }
 
 void z::Window::start()
 {
-	show();
+	cv::namedWindow(title_, cv::WINDOW_NORMAL | cv::WINDOW_KEEPRATIO);
 	cv::setMouseCallback(title_, mouse_callback, this);
+	show();
 }
 
 int z::Window::loop()
 {//get keyboard event
-	start();
-	for(int key; (key = cv::waitKey()) != -1;) {//destroy window make waitkey return -1
-		for(z::Widget* p : *this) if(p->focus()) {
-			if(p->gui_callback_.find(EVENT_KEYBOARD) != p->gui_callback_.end()) {
-				p->gui_callback_[EVENT_KEYBOARD](key, 0);
-				*this << *p;
-			}
-			if(p->user_callback_.find(EVENT_KEYBOARD) != p->user_callback_.end())
-				p->user_callback_[EVENT_KEYBOARD](key, 0);
-		}
-	}
+	for(int key; (key = cv::waitKey()) != -1;) keyboard_callback(key);//destroy window make waitkey return -1
 	return 0;
+}
+
+void z::Window::keyboard_callback(int key)
+{
+	for(z::Widget* p : *this) if(p->focus()) {
+		if(p->gui_callback_.find(EVENT_KEYBOARD) != p->gui_callback_.end()) {
+			p->gui_callback_[EVENT_KEYBOARD](key, 0);
+			*this << *p;
+		}
+		if(p->user_callback_.find(EVENT_KEYBOARD) != p->user_callback_.end())
+			p->user_callback_[EVENT_KEYBOARD](key, 0);
+	}
 }

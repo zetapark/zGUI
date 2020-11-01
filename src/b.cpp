@@ -20,17 +20,31 @@ protected:
 	int pos_ = 0;
 };
 
+class Pop : public z::Popup
+{
+public:
+	Pop(string title, cv::Rect2i r) : Popup(title, r) {
+		*this + sl_ + bt_ + la_;
+		bt_.click([this]() { quit(sl_.value()); });
+	}
+protected:
+	z::Slider sl_{{50, 50, 200, 30}, 0, 30, 1};
+	z::Button bt_{"ok", {150, 100, 40, 30}};
+	z::Label la_{"What do you want?", {50, 20, 200, 30}};
+};
+
 class Win : public z::Window
 {
 public:
 	Win(string title, cv::Rect2i r) : z::Window{title, r} {
 		input_.enter([](string s){cout << s << endl;});
 		popup_.click([this]() {cout << pop_win_.open() << endl;});
-		quit_.click([this](){ quit();});
+		quit_.click([this](){ close();});
 		sl_.on_change( [this](int val) { sl_label_.text(std::to_string(val)); *this << sl_label_; });
 		chk_.on_change([this](bool checked) { lb_.text(checked ? "green" : "blue"); *this << lb_; });
 		*this + popup_ + quit_ + click_ + chk_ + input_ + img_ + sl_ + lb_ + sl_label_;
-		th_ = std::thread{&Win::run, this};//to avoid mutex
+		start();//main thread imshow or namedWindow should come first
+		th_ = thread{&Win::run, this};
 	}
 	~Win() {
 		run_ = false;
@@ -40,7 +54,7 @@ protected:
 	std::thread th_;
 	RotateView<double, 4000, 1000> v_;
 	cv::Mat mat2_;
-	z::Popup pop_win_{"yes no", {0, 0, 300, 300}, "What do you want?"};
+	Pop pop_win_{"yes no", {0, 0, 300, 300}};
 	z::Button popup_{"Popup", {100, 100, 90, 30}}, quit_{"Quit", {200, 100, 80, 30}},
 		click_{"click", {300, 100, 90, 30}};
 	z::CheckBox chk_{"option", {100, 200, 20, 20}};
@@ -53,10 +67,10 @@ private:
 	void run() {
 		double x = 0;
 		for(int i=0; i<2000; i++, x+=0.01) v_.push_back(sin(x));
-		for(int i = 0; run_; i++, x+=0.01) {
-			auto a = CvPlot::plot({&v_[i], sl_.value() * 10}, chk_.checked() ? "-g" : "-b");
+		for(int i = 0; run_ && !chk_.checked(); i++, x+=0.01) {
+			auto a = CvPlot::plot({&v_[i], sl_.value() * 10}, "-b");
 			img_ = a.render(500, 800);
-			*this << img_;
+			*this << img_;//this should be executed after main win.start()
 			v_.push_back(sin(x));
 			if(i == 3000) i = -1;
 			this_thread::sleep_for(10ms);

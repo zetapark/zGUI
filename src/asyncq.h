@@ -1,5 +1,6 @@
 #pragma once
 #include <thread>
+#include<chrono>
 #include <condition_variable>
 #include<functional>
 #include <deque>
@@ -64,16 +65,17 @@ private:
 	bool empty() { return start_ == end_; }
 	void increase(int &i) { i++; if(i == N) i = 0; }
 	void run(std::function<void(T)> f) {
+		using namespace std::chrono_literals;
 		std::unique_lock<std::mutex> lck{mtx_, std::defer_lock};
 		while(run_) {
-			if(!empty()) {
+			if(empty()) {
+				lck.lock();
+				while(run_ && empty()) cv_.wait_for(lck, 100ms);
+				lck.unlock();
+			} else {
 				f(buffer_[start_]);
 				increase(start_);
 				cv_.notify_all();
-			} else {
-				lck.lock();
-				while(empty()) cv_.wait(lck);
-				lck.unlock();
 			}
 		}
 	}

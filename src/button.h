@@ -138,4 +138,20 @@ private:
 	bool user_hold_ = false;
 };
 
+class AsciiWindow : public Window
+{
+public:
+	AsciiWindow(const char *asciiart, int unit_width = 10, int unit_height = 15,
+			int tab_size = 4, int margin = 1);
+protected:
+	int uw_, uh_, margin_, tab_;
+	std::vector<std::string> art_, parsed_;
+	std::vector<Slider> S;
+	std::vector<Button> B;
+	std::vector<TextInput> T;
+	std::vector<CheckBox> C;
+	std::vector<Label> L;
+	std::vector<Image> I;
+};
+
 }

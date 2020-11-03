@@ -3,6 +3,7 @@
 #include<thread>
 #include<iostream>
 #include<opencv2/imgproc.hpp>
+#include"asyncq.h"
 #include"button.h"
 using namespace std;
 using namespace placeholders;
@@ -33,6 +34,18 @@ protected:
 	z::Label la_{"What do you want?", {50, 20, 200, 30}};
 };
 
+class Mat2 : public cv::Mat
+{
+	public:
+		Mat2(const cv::Mat &r) {
+			r.copyTo(*this);
+		}
+		Mat2 &operator=(const cv::Mat &r) {
+			r.copyTo(*this);
+			return *this;
+		}
+};
+
 class Win : public z::Window
 {
 public:
@@ -51,6 +64,7 @@ public:
 		th_.join();
 	}
 protected:
+	
 	std::thread th_;
 	RotateView<double, 4000, 1000> v_;
 	cv::Mat mat2_;
@@ -62,6 +76,9 @@ protected:
 	z::Image img_{{250, 200, 800, 500}};
 	z::Slider sl_{{10, 10, 300, 30}, 0, 100, 1};
 	z::Label lb_{"0", {130, 200, 70, 30}}, sl_label_{"", {320, 10, 40, 30}};
+	//WQueue<Mat2, 1000> q1_{[this](cv::Mat a) { img_ = a; *this << img_;}};
+	//WQueue<z::Image, 1000> q2_{[this](z::Image a) {*this << a; }};
+	//WQueue<CVPLOT_LIBRARY_INTERFACE CvPlot::Axes, 1000> q_{[this](CVPLOT_LIBRARY_INTERFACE  CvPlot::Axes a) { q1_.push_back(a.render(500, 800)); }};
 private:
 	bool run_ = true;
 	void run() {
@@ -80,7 +97,26 @@ private:
 
 int main()
 {
-	Win win{"hello", {0, 0, 1100, 900}};
+	z::AsciiWindow win{R"(
+	Wtitle-------------------------------------------
+	|     L0-------
+	|			|Test Label|
+	|     S0----------------- L1--
+	|     |0 1 100|           ||
+	|
+	|     B0----    B1------   B2-----
+	|     |Popup|   |Cancel|   |Click|
+	|     C0 L2--
+	|     T0--------
+	|     ||
+	|
+	|     I0---------------------
+	|     ||
+	|     |
+	|     |
+	|     |
+	|)"};
+	//Win win{"hello", {0, 0, 1100, 900}};
 	return win.loop();
 }
 

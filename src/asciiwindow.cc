@@ -1,7 +1,7 @@
 #include<opencv2/opencv.hpp>
 #include"button.h"
 using namespace std;
-
+//asc2 art example below, never use tab.
 	/*
 	Wtitle-------------------------------------------
 	|     L0-------
@@ -34,27 +34,31 @@ z::AsciiWindow::AsciiWindow(const char *p, int unit_width, int unit_height, int 
 	while(*p != '-') title_ += *p++;
 	while(*p == '-') p++, width++;
 	width += title_.size();
-	for(; *p; p++) if(*p == '|') {
+
+	for(; *p; p++) if(*p == '|') {//construct 2 dim array of asc2 art
 		string s;
 		while(*p != '\n' && *p) s += *p++;
 		s.resize(width, ' ');
 		art_.push_back(s);
 	}
-	parsed_ = art_;
+	parsed_ = art_;//for parse check
 	for(auto &a : parsed_) for(auto &b : a) b = ' ';
 	height = art_.size() * unit_height;
 	width *= unit_width;
 	cv::resize(mat_, mat_, {width, height});
+
 	parse_art();
-	for(auto &a : C) *this + *a.get();
+	//add to window
 	for(auto &a : B) *this + *a.get();
 	for(auto &a : L) *this + *a.get();
 	for(auto &a : S) *this + *a.get();
+	for(auto &a : C) *this + *a.get();
 	for(auto &a : T) *this + *a.get();
 	for(auto &a : I) *this + *a.get();
 }
 
-void z::AsciiWindow::parse_art() {
+void z::AsciiWindow::parse_art()
+{//parse asc2 art and populate member CBLSTI
 	bool retry = false;
 	for(int y=0; y<art_.size(); y++) for(int x=0; x<art_[y].size(); x++) 
 		if(isalpha(art_[y][x]) && parsed_[y][x] != 'v')
@@ -62,7 +66,8 @@ void z::AsciiWindow::parse_art() {
 	if(retry) parse_art();
 }
 
-int z::AsciiWindow::get_size(char c) {
+int z::AsciiWindow::get_size(char c)
+{//return vector size of designated widget type
 	switch(c) {
 		case 'B': return B.size();
 		case 'L': return L.size();
@@ -75,7 +80,7 @@ int z::AsciiWindow::get_size(char c) {
 }
 
 array<int, 3> get_slider_param(const string &s, int pos)
-{
+{//start stop step -> int
 	array<int, 3> r;
 	stringstream ss;
 	ss << s.substr(pos);
@@ -84,17 +89,17 @@ array<int, 3> get_slider_param(const string &s, int pos)
 }
 
 bool z::AsciiWindow::parse_widget_area(int y, int x)
-{
-	string text;
+{//parse a rect of asc2 art widget inside window
+	string text;//get text between | |
 	if(art_[y+1][x] == '|') for(int x2 = x; art_[y+1][++x2] != '|';) {
 		text += art_[y+1][x2];
-		parsed_[y+1][x2] = 'v';
+		parsed_[y+1][x2] = 'v';//disable text
 	}
-	if(art_[y][x+1] - '0' != get_size(art_[y][x])) return false;
+	if(art_[y][x+1] - '0' != get_size(art_[y][x])) return false;//if order is not right
 
-	parsed_[y][x] = 'v';
-	int h = 1, w = 2, num = art_[y][x+1] - '0';
-	for(int y2 = y; art_[++y2][x] == '|';) h++;
+	parsed_[y][x] = 'v';//been here
+	int h = 1, w = 2;
+	for(int y2 = y; art_[++y2][x] == '|';) h++;//calculate widget size
 	for(int x2 = x+1; art_[y][++x2] == '-';) w++;
 	cv::Rect2i r{x*uw_+margin_, y*uh_+margin_, w*uw_ - 2*margin_, h*uh_ - 2*margin_};
 	switch(art_[y][x]) {

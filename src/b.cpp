@@ -95,16 +95,35 @@ private:
 	}
 };
 
+struct PopWin : z::AsciiPopup
+{
+	PopWin() : z::AsciiPopup{R"(
+	W-------------------------------------
+	|
+	|   L0--------------------------
+	|   |Will you accept?|
+	|
+	|   B0------  B1-------
+	|   |Yes|     |No|
+	|
+	|)"}
+	{
+		B[0]->click([this](){quit(1);});
+		B[1]->click([this](){quit(0);});
+	}
+};
+
 struct Mywin : z::AsciiWindow {
 	Mywin() : z::AsciiWindow{ R"(
 		WThis is a test--------------------------------------
+		|
 		|     L0------------------    B3---------
 		|     |Test Label|            |This is|
 		|     S0----------------- L1--
 		|     |0 100 1|           |0|
 		|
-		|     B0------- B1------- B2-----
-		|     |Popup|   |Cancel|  |Quit|
+		|     B0------- B1------- B2-----B4-------
+		|     |Popup|   |Cancel|  |Quit| |123|
 		|     C0 L2--------
 		|     || |check|
 		|     T0--------
@@ -115,20 +134,33 @@ struct Mywin : z::AsciiWindow {
 		|     |
 		|     |
 		|     |
+		|     |
+		|     |
+		|     |
+		|     |
+		|     |
+		|     |
+		|     |
 		|)" }//no tab inside
 	{
 		S[0]->on_change([this](int val) {L[1]->text(to_string(val)); *this << *L[1];});
-		B[0]->click([]() {cout << "hello" << endl;});
+		B[0]->click([this]() {cout << (pop.open() ? "Yes" : "No") << endl;});
 		B[1]->click([this]() {L[0]->text(to_string(S[0]->value())); *this << *L[0];});
 		B[2]->click([this]() {close();});
 		B[3]->click([this]() {cout << "3" << endl;});
+		C[0]->on_change([this](bool checked) {L[2]->text( checked ? "On" : "Off"); *this << *L[2];});
+		*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); *this << *I[0];
+		*this + bt_; *this << bt_;
+		start();
 	}
+
+	z::Button bt_{"by", {0,0, 50, 50}};
+	PopWin pop;
 };
 
 int main()
 {
 	Mywin win;
-	win.start();
 	return win.loop();
 }
 

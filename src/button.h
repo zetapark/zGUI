@@ -156,4 +156,15 @@ protected:
 	std::vector<std::shared_ptr<Image>> I;
 };
 
+class AsciiPopup : public AsciiWindow
+{
+public:
+	AsciiPopup(const char *p, int uw = 10, int uh = 15, int margin = 1);
+	int open();
+	void quit(int r);
+private:
+	bool closed_ = false;
+	int result_ = 0;
+};
+
 }

@@ -95,33 +95,40 @@ private:
 	}
 };
 
+struct Mywin : z::AsciiWindow {
+	Mywin() : z::AsciiWindow{ R"(
+		WThis is a test--------------------------------------
+		|     L0------------------    B3---------
+		|     |Test Label|            |This is|
+		|     S0----------------- L1--
+		|     |0 100 1|           |0|
+		|
+		|     B0------- B1------- B2-----
+		|     |Popup|   |Cancel|  |Quit|
+		|     C0 L2--------
+		|     || |check|
+		|     T0--------
+		|     ||
+		|
+		|     I0---------------------
+		|     ||
+		|     |
+		|     |
+		|     |
+		|)" }//no tab inside
+	{
+		S[0]->on_change([this](int val) {L[1]->text(to_string(val)); *this << *L[1];});
+		B[0]->click([]() {cout << "hello" << endl;});
+		B[1]->click([this]() {L[0]->text(to_string(S[0]->value())); *this << *L[0];});
+		B[2]->click([this]() {close();});
+		B[3]->click([this]() {cout << "3" << endl;});
+	}
+};
+
 int main()
 {
-	z::AsciiWindow win{R"(
-	WThis is a test--------------------------------------
-	|     L0------------------
-	|     |Test Label|
-	|     S0----------------- L1--
-	|     |0 100 1|           |0|
-	|
-	|     B0------- B1------- B2-----
-	|     |Popup|   |Cancel|  |Click|
-	|     C0 L2--------
-	|     || |check|
-	|     T0--------
-	|     ||
-	|
-	|     I0---------------------
-	|     ||
-	|     |
-	|     |
-	|     |
-	|)"};//no tab inside
+	Mywin win;
 	win.start();
-	z::Button b{"t", {200, 0, 100, 30}};
-	vector<z::Button> v = {z::Button{"t", {200, 0, 100, 30}}};
-	//v.emplace_back(&b);
-//	Win win{"hello", {0, 0, 1100, 900}};
 	return win.loop();
 }
 

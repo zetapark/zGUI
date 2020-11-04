@@ -144,7 +144,7 @@ public:
 	AsciiWindow(const char *asciiart, int unit_width = 10, int unit_height = 15, int margin = 1);
 protected:
 	int get_size(char c);
-	void parse_widget_area(int y, int x);
+	bool parse_widget_area(int y, int x);
 	void parse_art();
 	int uw_, uh_, margin_;
 	std::vector<std::string> art_, parsed_;

@@ -57,9 +57,8 @@ z::AsciiWindow::AsciiWindow(const char *p, int unit_width, int unit_height, int 
 void z::AsciiWindow::parse_art() {
 	bool retry = false;
 	for(int y=0; y<art_.size(); y++) for(int x=0; x<art_[y].size(); x++) 
-		if(char c = art_[y][x]; isalpha(c) && parsed_[y][x] != 'v')
-			if(art_[y][x+1] - '0' == get_size(c)) parse_widget_area(y, x);
-			else retry = true;
+		if(isalpha(art_[y][x]) && parsed_[y][x] != 'v')
+			if(!parse_widget_area(y, x)) retry = true;//if L2 -> 2 is not in order
 	if(retry) parse_art();
 }
 
@@ -84,18 +83,20 @@ array<int, 3> get_slider_param(const string &s, int pos)
 	return r;
 }
 
-void z::AsciiWindow::parse_widget_area(int y, int x)
+bool z::AsciiWindow::parse_widget_area(int y, int x)
 {
+	string text;
+	if(art_[y+1][x] == '|') for(int x2 = x; art_[y+1][++x2] != '|';) {
+		text += art_[y+1][x2];
+		parsed_[y+1][x2] = 'v';
+	}
+	if(art_[y][x+1] - '0' != get_size(art_[y][x])) return false;
+
 	parsed_[y][x] = 'v';
 	int h = 1, w = 2, num = art_[y][x+1] - '0';
 	for(int y2 = y; art_[++y2][x] == '|';) h++;
 	for(int x2 = x+1; art_[y][++x2] == '-';) w++;
 	cv::Rect2i r{x*uw_+margin_, y*uh_+margin_, w*uw_ - 2*margin_, h*uh_ - 2*margin_};
-	string text;
-	for(int x2 = x; art_[y+1][++x2] != '|';) {
-		text += art_[y+1][x2];
-		parsed_[y+1][x2] = 'v';
-	}
 	switch(art_[y][x]) {
 		case 'B': B.emplace_back(make_shared<z::Button>(text, r)); break;
 		case 'L': L.emplace_back(make_shared<z::Label>(text, r)); break;
@@ -106,4 +107,5 @@ void z::AsciiWindow::parse_widget_area(int y, int x)
 		case 'T': T.emplace_back(make_shared<z::TextInput>(r)); break;
 		case 'I': I.emplace_back(make_shared<z::Image>(r)); break;
 	}
+	return true;
 }

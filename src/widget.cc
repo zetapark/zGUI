@@ -15,4 +15,3 @@ bool z::Widget::focus() {
 void z::Widget::focus(bool tf) {
 	focus_ = tf;
 }
-

@@ -56,7 +56,7 @@ private:
 class CheckBox : public Widget
 {
 public:
-	CheckBox(std::string text, cv::Rect2i r);
+	CheckBox(cv::Rect2i r);
 	bool checked();
 	void on_change(std::function<void(bool)> f);
 protected:
@@ -141,17 +141,19 @@ private:
 class AsciiWindow : public Window
 {
 public:
-	AsciiWindow(const char *asciiart, int unit_width = 10, int unit_height = 15,
-			int tab_size = 4, int margin = 1);
+	AsciiWindow(const char *asciiart, int unit_width = 10, int unit_height = 15, int margin = 1);
 protected:
-	int uw_, uh_, margin_, tab_;
+	int get_size(char c);
+	void parse_widget_area(int y, int x);
+	void parse_art();
+	int uw_, uh_, margin_;
 	std::vector<std::string> art_, parsed_;
-	std::vector<Slider> S;
-	std::vector<Button> B;
-	std::vector<TextInput> T;
-	std::vector<CheckBox> C;
-	std::vector<Label> L;
-	std::vector<Image> I;
+	std::vector<std::shared_ptr<Slider>> S;
+	std::vector<std::shared_ptr<Button>> B;
+	std::vector<std::shared_ptr<TextInput>> T;
+	std::vector<std::shared_ptr<CheckBox>> C;
+	std::vector<std::shared_ptr<Label>> L;
+	std::vector<std::shared_ptr<Image>> I;
 };
 
 }

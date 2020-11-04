@@ -1,16 +1,13 @@
 #include<iostream>
+#include<opencv2/opencv.hpp>
 #include"asyncq.h"
 using namespace std;
 
 int main()
 {
-	WQueue<int, 100> q2{[&](int i) { cout << "q2 " << i << endl;}};
-	WQueue<int, 100> q{[&](int i) { cout << "q " << i << endl; q2.push_back(i+1);}};
-	thread th{[&]() { for(int i=0; i<10000; i++) q.push_back(i); }};
-	thread th2{[&]() { for(int i=0; i<10000; i++) q.push_back(-i); }};
-	th.join();
-	th2.join();
-	char c;
-	cin >> c;
+	cv::Mat3b mat(40, 30);
+	vector<cv::Mat3b> v;
+	v.push_back(cv::Mat3b(40, 30));
+	cout << v[0].cols << endl;
 }
 

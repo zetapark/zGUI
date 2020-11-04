@@ -3,7 +3,7 @@
 using namespace std;
 using namespace placeholders;
 
-z::CheckBox::CheckBox(string text, cv::Rect2i r) : z::Widget{r}
+z::CheckBox::CheckBox(cv::Rect2i r) : z::Widget{r}
 {
 	mat_ = cv::Vec3b{100, 100, 100};
 	inner_rect_ = cv::Rect2i{cv::Point2i{5, 5}, cv::Point2i{width-5, height-5}};

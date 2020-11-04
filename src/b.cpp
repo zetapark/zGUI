@@ -71,7 +71,7 @@ protected:
 	Pop pop_win_{"yes no", {0, 0, 300, 300}};
 	z::Button popup_{"Popup", {100, 100, 90, 30}}, quit_{"Quit", {200, 100, 80, 30}},
 		click_{"click", {300, 100, 90, 30}};
-	z::CheckBox chk_{"option", {100, 200, 20, 20}};
+	z::CheckBox chk_{{100, 200, 20, 20}};
 	z::TextInput input_{{100, 300, 140, 30}};
 	z::Image img_{{250, 200, 800, 500}};
 	z::Slider sl_{{10, 10, 300, 30}, 0, 100, 1};
@@ -98,15 +98,16 @@ private:
 int main()
 {
 	z::AsciiWindow win{R"(
-	Wtitle-------------------------------------------
-	|     L0-------
-	|			|Test Label|
+	WThis is a test--------------------------------------
+	|     L0------------------
+	|     |Test Label|
 	|     S0----------------- L1--
-	|     |0 1 100|           ||
+	|     |0 100 1|           |0|
 	|
-	|     B0----    B1------   B2-----
-	|     |Popup|   |Cancel|   |Click|
-	|     C0 L2--
+	|     B0------- B1------- B2-----
+	|     |Popup|   |Cancel|  |Click|
+	|     C0 L2--------
+	|     || |check|
 	|     T0--------
 	|     ||
 	|
@@ -115,8 +116,12 @@ int main()
 	|     |
 	|     |
 	|     |
-	|)"};
-	//Win win{"hello", {0, 0, 1100, 900}};
+	|)"};//no tab inside
+	win.start();
+	z::Button b{"t", {200, 0, 100, 30}};
+	vector<z::Button> v = {z::Button{"t", {200, 0, 100, 30}}};
+	//v.emplace_back(&b);
+//	Win win{"hello", {0, 0, 1100, 900}};
 	return win.loop();
 }
 

@@ -2,41 +2,30 @@
 #include"button.h"
 using namespace std;
 
-z::Popup::Popup(string title, cv::Rect2i r) : z::Window{title, r}
+z::PopupInterface::PopupInterface(z::Window *p)
 {
-	title_ = title;
+	window_ptr_ = p;
 }
 
-int z::Popup::open()
+int z::PopupInterface::open(int flag)
 {
-	start();
-	while(!closed_) if(int key = cv::waitKey(10); key != -1) keyboard_callback(key);
+	window_ptr_->start(flag);
+	while(!closed_) if(int key = cv::waitKey(10); key != -1) window_ptr_->keyboard_callback(key);
 	closed_ = false;
 	return result_;
 }
 
-void z::Popup::quit(int r)
+void z::PopupInterface::quit(int r)
 {
 	result_ = r;
 	closed_ = true;
-	close();
+	window_ptr_->close();
 }
 
-z::AsciiPopup::AsciiPopup(const char *p, int unit_width, int unit_height, int margin)
-	: z::AsciiWindow(p, unit_width, unit_height, margin)
+z::Popup::Popup(string title, cv::Rect2i r) : z::Window{title, r}, PopupInterface{this}
 { }
 
-int z::AsciiPopup::open()
-{
-	start();
-	while(!closed_) if(int key = cv::waitKey(10); key != -1) keyboard_callback(key);
-	closed_ = false;
-	return result_;
-}
+z::AsciiPopup::AsciiPopup(const char *p, int unit_width, int unit_height, int margin)
+	: z::AsciiWindow(p, unit_width, unit_height, margin), PopupInterface{this}
+{ }
 
-void z::AsciiPopup::quit(int r)
-{
-	result_ = r;
-	closed_ = true;
-	close();
-}

@@ -20,7 +20,7 @@ void z::Slider::draw()
 {
 	mat_ = background_color_;
 	cv::line(mat_, {10, height / 2}, {width - 11, height / 2}, {100, 100, 100});
-	cv::circle(mat_, {to_pos(value_), height / 2}, 10, {230, 230, 230}, -1);
+	cv::circle(mat_, {to_pos(value_), height / 2}, 10, widget_color_, -1);
 }
 
 int z::Slider::to_pos(int val)

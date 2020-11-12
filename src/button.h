@@ -1,7 +1,8 @@
 #include<mutex>
 #include<map>
 #include<functional>
-#include <opencv2/highgui.hpp>
+#include<opencv2/highgui.hpp>
+#include<opencv2/freetype.hpp>
 #define EVENT_ENTER 8000
 #define EVENT_LEAVE 8001
 #define EVENT_KEYBOARD 8002
@@ -22,7 +23,11 @@ public:
 
 protected:
 	bool focus_ = false;
-	const cv::Vec3b background_color_ = cv::Vec3b{200, 200, 200};
+	static cv::Ptr<cv::freetype::FreeType2> ft2_;
+	const cv::Vec3b background_color_{200, 200, 200};
+	const cv::Vec3b widget_color_{220, 220, 220};
+	const cv::Vec3b highlight_color_{255, 255, 255};
+	const cv::Vec3b click_color_{180, 180, 180};
 };
 
 class Label : public Widget
@@ -48,9 +53,6 @@ private:
 	void ldown(int, int);
 	void lup(int, int);
 	void label();
-	const cv::Vec3b base_color{220, 220, 220};
-	const cv::Vec3b hover_color{255, 255, 255};
-	const cv::Vec3b click_color{185, 180, 180};
 };
 
 class CheckBox : public Widget
@@ -58,13 +60,13 @@ class CheckBox : public Widget
 public:
 	CheckBox(cv::Rect2i r);
 	bool checked();
+	void checked(bool);
 	void on_change(std::function<void(bool)> f);
 protected:
-	std::string text_;
 	bool checked_ = false;
 private:
 	void click(int, int);
-	cv::Rect2i inner_rect_;
+	int r_;
 };
 
 class Window : public Widget
@@ -77,24 +79,13 @@ public:
 	int loop();
 	std::vector<Widget*>::iterator begin(), end();
 	void close();
-	void start();
+	void start(int flag = cv::WINDOW_NORMAL | cv::WINDOW_KEEPRATIO);
+	void keyboard_callback(int key);
 
 protected:
 	std::string title_;
 	std::vector<Widget*> widgets_;
-	void keyboard_callback(int key);
 	//std::mutex mtx_;
-};
-
-class Popup : public Window
-{
-public:
-	Popup(std::string title, cv::Rect2i r);
-	int open();
-	void quit(int r);
-private:
-	bool closed_ = false;
-	int result_ = 0;
 };
 
 class Image : public Widget
@@ -138,33 +129,56 @@ private:
 	bool user_hold_ = false;
 };
 
+class Progress : public Widget
+{
+public:
+	Progress(cv::Rect2i r);
+	void value(int val);
+	int value();
+protected:
+	int value_ = 0;
+};
+
 class AsciiWindow : public Window
 {
 public:
 	AsciiWindow(const char *asciiart, int unit_width = 10, int unit_height = 15, int margin = 1);
 protected:
-	int get_size(char c);
-	bool parse_widget_area(int y, int x);
-	void parse_art();
-	int uw_, uh_, margin_;
-	std::vector<std::string> art_, parsed_;
 	std::vector<std::shared_ptr<Slider>> S;
 	std::vector<std::shared_ptr<Button>> B;
 	std::vector<std::shared_ptr<TextInput>> T;
 	std::vector<std::shared_ptr<CheckBox>> C;
 	std::vector<std::shared_ptr<Label>> L;
 	std::vector<std::shared_ptr<Image>> I;
+	std::vector<std::shared_ptr<Progress>> P;
+private:
+	int get_size(char c);
+	bool parse_widget_area(int y, int x);
+	void parse_art();
+	int uw_, uh_, margin_;
+	std::vector<std::string> art_, parsed_;
 };
 
-class AsciiPopup : public AsciiWindow
-{
+class PopupInterface {
 public:
-	AsciiPopup(const char *p, int uw = 10, int uh = 15, int margin = 1);
-	int open();
+	PopupInterface(Window *p);
+	int open(int flag = cv::WINDOW_AUTOSIZE);
 	void quit(int r);
-private:
+protected:
 	bool closed_ = false;
 	int result_ = 0;
+private:
+	Window *window_ptr_ = nullptr;
+};
+
+struct Popup : Window, PopupInterface
+{
+	Popup(std::string title, cv::Rect2i r);
+};
+
+struct AsciiPopup : AsciiWindow, PopupInterface
+{
+	AsciiPopup(const char *p, int uw = 10, int uh = 15, int margin = 1);
 };
 
 }

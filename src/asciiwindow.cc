@@ -26,7 +26,7 @@ using namespace std;
 
 z::AsciiWindow::AsciiWindow(const char *p, int unit_width, int unit_height, int margin)
 	: z::Window{"", {0,0,1,1}}
-{//Button, Image, Slider, Label, Text, Chckbox, Window
+{//Button, Image, Slider, Label, Text, Chckbox, Window, Progress bar
 	uw_ = unit_width; uh_ = unit_height; margin_ = margin;
 	width = 1;
 	while(*p != 'W') p++;
@@ -55,6 +55,7 @@ z::AsciiWindow::AsciiWindow(const char *p, int unit_width, int unit_height, int 
 	for(auto &a : C) *this + *a.get();
 	for(auto &a : T) *this + *a.get();
 	for(auto &a : I) *this + *a.get();
+	for(auto &a : P) *this + *a.get();
 }
 
 void z::AsciiWindow::parse_art()
@@ -75,6 +76,7 @@ int z::AsciiWindow::get_size(char c)
 		case 'C': return C.size();
 		case 'T': return T.size();
 		case 'I': return I.size();
+		case 'P': return P.size();
 		default: throw 0;
 	}
 }
@@ -111,6 +113,7 @@ bool z::AsciiWindow::parse_widget_area(int y, int x)
 		case 'C': C.emplace_back(make_shared<z::CheckBox>(r)); break;
 		case 'T': T.emplace_back(make_shared<z::TextInput>(r)); break;
 		case 'I': I.emplace_back(make_shared<z::Image>(r)); break;
+		case 'P': P.emplace_back(make_shared<z::Progress>(r)); break;
 	}
 	return true;
 }

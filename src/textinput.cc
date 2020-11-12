@@ -16,7 +16,7 @@ void z::TextInput::key_event(int key, int)
 	else if(key >= 0x20 && key <= 0x7e) value_ += key;
 	else return;
 	mat_ = white;
-	cv::putText(mat_, value_, {0, 20}, 0, .7, {0,0,0}, 2);
+	ft2_->putText(mat_, value_, {0, 0}, height * 0.8, {0, 0, 0}, -1, 4, false);
 }
 
 void z::TextInput::enter(function<void(string)> f)

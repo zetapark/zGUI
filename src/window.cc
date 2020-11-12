@@ -85,9 +85,9 @@ void z::Window::close()
 	cv::destroyWindow(title_);
 }
 
-void z::Window::start()
+void z::Window::start(int flag)
 {
-	cv::namedWindow(title_, cv::WINDOW_NORMAL | cv::WINDOW_KEEPRATIO);
+	cv::namedWindow(title_, flag);
 	cv::setMouseCallback(title_, mouse_callback, this);
 	show();
 }

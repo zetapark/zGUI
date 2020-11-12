@@ -8,7 +8,7 @@ using namespace placeholders;
 z::Button::Button(string text, cv::Rect_<int> r) : z::Widget{r}
 {
 	text_ = text;
-	mat_ = base_color;
+	mat_ = widget_color_;
 	//mat_(cv::Rect2i{4, 4, this->width - 8, this->height - 8}) = base_color;
 	label();
 	gui_callback_[EVENT_ENTER] = bind(&Button::enter, this, _1, _2);
@@ -19,26 +19,26 @@ z::Button::Button(string text, cv::Rect_<int> r) : z::Widget{r}
 
 void z::Button::label()
 {
-	cv::putText(mat_, text_, {10, 20}, 0, .7, {0,0,0}, 2);
+	ft2_->putText(mat_, text_, {0, 0}, height * 0.8, {0,0,0}, -1, 4, false);
 }
 void z::Button::leave(int, int)
 {
-	mat_ = base_color;
+	mat_ = widget_color_;
 	label();
 }
 void z::Button::enter(int, int)
 {
-	mat_ = hover_color;
+	mat_ = highlight_color_;
 	label();
 }
 void z::Button::ldown(int, int)
 {
-	mat_ = click_color;
+	mat_ = click_color_;
 	label();
 }
 void z::Button::lup(int x, int y)
 {
-	mat_ = base_color;
+	mat_ = widget_color_;
 	label();
 }
 void z::Button::click(function<void()> f) 

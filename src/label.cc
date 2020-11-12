@@ -16,5 +16,5 @@ void z::Label::text(string s)
 {
 	text_ = s;
 	mat_ = background_color_;
-	cv::putText(mat_, text_, {0, height-10}, 0, 0.7, {0, 0, 0});
+	ft2_->putText(mat_, text_, {0, 0}, height * 0.8, {0, 0, 0}, -1, 4, false);
 }

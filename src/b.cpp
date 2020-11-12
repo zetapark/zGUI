@@ -95,18 +95,20 @@ private:
 	}
 };
 
-struct PopWin : z::AsciiPopup
+struct PopWin : z::AsciiWindow, z::PopupInterface
 {
-	PopWin() : z::AsciiPopup{R"(
+	PopWin() : z::AsciiWindow{R"(
 	W-------------------------------------
 	|
 	|   L0--------------------------
 	|   |Will you accept?|
+	|   L1--------------------------
+	|   |This is it.|
 	|
 	|   B0------  B1-------
 	|   |Yes|     |No|
 	|
-	|)"}
+	|)"}, z::PopupInterface(this)
 	{
 		B[0]->click([this](){quit(1);});
 		B[1]->click([this](){quit(0);});
@@ -119,13 +121,15 @@ struct Mywin : z::AsciiWindow {
 		|
 		|     L0------------------    B3---------
 		|     |Test Label|            |This is|
-		|     S0----------------- L1--
-		|     |0 100 1|           |0|
+		|     S0----------------- L1---
+		|     |0 100 1|           |50|
 		|
 		|     B0------- B1------- B2-----B4-------
 		|     |Popup|   |Cancel|  |Quit| |123|
+    |
 		|     C0 L2--------
 		|     || |check|
+		|
 		|     T0--------
 		|     ||
 		|
@@ -135,23 +139,27 @@ struct Mywin : z::AsciiWindow {
 		|     |
 		|     |
 		|     |
+		|     |                         P0-------------------
+		|     |                         
 		|     |
 		|     |
 		|     |
 		|     |
-		|     |
-		|     |
-		|)" }//no tab inside
+		|)", 14, 21 }//no tab inside
 	{
-		S[0]->on_change([this](int val) {L[1]->text(to_string(val)); *this << *L[1];});
+		S[0]->on_change([this](int val) {
+				L[1]->text(to_string(val)); *this << *L[1];
+				P[0]->value(val); *this << *P[0];
+				});
 		B[0]->click([this]() {cout << (pop.open() ? "Yes" : "No") << endl;});
 		B[1]->click([this]() {L[0]->text(to_string(S[0]->value())); *this << *L[0];});
 		B[2]->click([this]() {close();});
 		B[3]->click([this]() {cout << "3" << endl;});
 		C[0]->on_change([this](bool checked) {L[2]->text( checked ? "On" : "Off"); *this << *L[2];});
+		start();//namedWindow should be called before updating (*this << *I[0])
 		*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); *this << *I[0];
 		*this + bt_; *this << bt_;
-		start();
+		P[0]->value(50); *this << *P[0];
 	}
 
 	z::Button bt_{"by", {0,0, 50, 50}};

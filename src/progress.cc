@@ -11,7 +11,7 @@ void z::Progress::value(int val)
 {
 	value_ = val;
 	cv::rectangle(mat_, {0, height / 3, width, height / 3}, click_color_, -1);
-	cv::rectangle(mat_, {0, height / 3, val * width / 100 , height / 3}, widget_color_, -1);
+	shade_rect({0, height / 3, val * width /100, height / 3}, 2);
 }
 
 int z::Progress::value()

@@ -3,6 +3,17 @@
 using namespace std;
 
 cv::Ptr<cv::freetype::FreeType2> z::Widget::ft2_;
+const cv::Vec3b z::Widget::background_color_ = {200, 200, 200};
+const cv::Vec3b z::Widget::widget_color_ = {220, 220, 220};
+const cv::Vec3b z::Widget::highlight_color_ = {240, 240, 240};
+const cv::Vec3b z::Widget::click_color_ = {180, 180, 180};
+
+void z::Widget::shade_rect(cv::Rect2i r, int shade, cv::Vec3b color) {
+	cv::rectangle(mat_, r, highlight_color_, -1);
+	cv::rectangle(mat_, {{r.x + shade, r.y + shade}, r.br()}, click_color_, -1);
+	cv::rectangle(mat_, {r.x + shade, r.y + shade, r.width - 2 * shade,
+			r.height - 2 * shade}, color, -1);
+}
 
 z::Widget::Widget(cv::Rect_<int> r)
 	: Rect_<int>{r}

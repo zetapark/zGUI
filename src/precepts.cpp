@@ -4,6 +4,7 @@
 #include"button.h"
 using namespace std;
 
+const char *pr[] = {"108-1", "108-2", "108-3", "명상", "경전", "운동", "걷기"};
 struct Mywin : z::AsciiWindow
 {
 	Mywin() : z::AsciiWindow{R"(
@@ -20,7 +21,7 @@ struct Mywin : z::AsciiWindow
 		|     
 		|
 		|     B0-------------        B1---------------
-		|     |Restart|              |저장 후 종료|
+		|     |새로운 시작|     |저장 후 종료|
 		|
 		|)", 20, 30}
 	{
@@ -28,13 +29,14 @@ struct Mywin : z::AsciiWindow
 		string home{getenv("HOME")};
 		B[0]->click([this]() { for(int i=0; i<7; i++) C[i]->checked(false), *this << *C[i]; });
 		B[1]->click([this, home]() {
-				ofstream f{home + "/.precepts"};
-				for(int i=0; i<7; i++) f << C[i]->checked() << ' ';
+				ofstream f{home + "/Dropbox/precepts.txt"};
+				for(int i=0; i<7; i++) f << C[i]->checked() << ' ' << pr[i] << endl;
 				close();
 			});
 		bool tf;
-		ifstream f{home + "/.precepts"};
-		for(int i=0; i<7; i++) f >> tf, C[i]->checked(tf), *this << *C[i];
+		ifstream f{home + "/Dropbox/precepts.txt"};
+		string s;
+		for(int i=0; i<7; i++) f >> tf, getline(f, s), C[i]->checked(tf), *this << *C[i];
 		cv::moveWindow(title_, 700, 500);
 	}
 };

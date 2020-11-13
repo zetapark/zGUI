@@ -117,17 +117,17 @@ struct PopWin : z::AsciiWindow, z::PopupInterface
 
 struct Mywin : z::AsciiWindow {
 	Mywin() : z::AsciiWindow{ R"(
-		WThis is a test--------------------------------------
+		WThis is a test------------------------------------------
 		|
-		|     L0------------------    B3---------
-		|     |Test Label|            |This is|
-		|     S0----------------- L1---
-		|     |0 100 1|           |50|
-		|
-		|     B0------- B1------- B2-----B4-------
-		|     |Popup|   |Cancel|  |Quit| |123|
-    |
-		|     C0 L2--------
+		|     L0------------------    B3---------     S1-
+		|     |Test Label|            |This is|       |0 100 1|
+		|     S0----------------- L1---               |
+		|     |0 100 1|           |50|                |
+		|                                             |
+		|     B0------- B1------- B2-----B4-------    |
+		|     |Popup|   |Cancel|  | Quit||123|        |
+    |                                             |
+		|     C0 L2--------                           
 		|     || |check|
 		|
 		|     T0--------
@@ -140,16 +140,16 @@ struct Mywin : z::AsciiWindow {
 		|     |
 		|     |
 		|     |                         P0-------------------
-		|     |                         
+		|     |                         ||
 		|     |
 		|     |
 		|     |
 		|     |
 		|)", 14, 21 }//no tab inside
 	{
-		S[0]->on_change([this](int val) {
-				L[1]->text(to_string(val)); *this << *L[1];
-				P[0]->value(val); *this << *P[0];
+		S[1]->on_change([this](int val) {
+				L[1]->text(to_string(100-val)); *this << *L[1];
+				P[0]->value(100-val); *this << *P[0];
 				});
 		B[0]->click([this]() {cout << (pop.open() ? "Yes" : "No") << endl;});
 		B[1]->click([this]() {L[0]->text(to_string(S[0]->value())); *this << *L[0];});

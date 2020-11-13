@@ -1,4 +1,3 @@
-#include<mutex>
 #include<map>
 #include<functional>
 #include<opencv2/highgui.hpp>
@@ -8,6 +7,7 @@
 #define EVENT_KEYBOARD 8002
 
 namespace z {
+
 
 class Widget : public cv::Rect_<int>
 {//base class for all widgets
@@ -22,12 +22,10 @@ public:
 	cv::Mat3b mat_;//widget shape
 
 protected:
+	static const cv::Vec3b background_color_, widget_color_, highlight_color_, click_color_;
+	void shade_rect(cv::Rect2i r, int shade = 3, cv::Vec3b color = widget_color_);
 	bool focus_ = false;
 	static cv::Ptr<cv::freetype::FreeType2> ft2_;
-	const cv::Vec3b background_color_{200, 200, 200};
-	const cv::Vec3b widget_color_{220, 220, 220};
-	const cv::Vec3b highlight_color_{255, 255, 255};
-	const cv::Vec3b click_color_{180, 180, 180};
 };
 
 class Label : public Widget
@@ -48,10 +46,7 @@ public:
 protected:
 	std::string text_;
 private:
-	void leave(int, int);
-	void enter(int, int);
-	void ldown(int, int);
-	void lup(int, int);
+	void repaint(cv::Vec3b color);
 	void label();
 };
 
@@ -85,7 +80,6 @@ public:
 protected:
 	std::string title_;
 	std::vector<Widget*> widgets_;
-	//std::mutex mtx_;
 };
 
 class Image : public Widget

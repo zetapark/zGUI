@@ -67,6 +67,16 @@ z::Window& z::Window::operator+(z::Widget &w)
 	return *this;
 }
 
+string z::Window::title()
+{
+	return title_;
+}
+
+void z::Window::update(const z::Widget &r) 
+{
+	r.mat_.copyTo(mat_(r));
+}
+
 z::Window& z::Window::operator<<(z::Widget &r)
 {
 	//lock_guard<mutex> lck{mtx_};

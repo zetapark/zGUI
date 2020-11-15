@@ -27,7 +27,7 @@ struct Mywin : z::AsciiWindow
 	{
 		start();
 		string home{getenv("HOME")};
-		B[0]->click([this]() { for(int i=0; i<7; i++) C[i]->checked(false), *this << *C[i]; });
+		B[0]->click([this]() { for(int i=0; i<7; i++) C[i]->checked(false), update(*C[i]); });
 		B[1]->click([this, home]() {
 				ofstream f{home + "/Dropbox/precepts.txt"};
 				for(int i=0; i<7; i++) f << C[i]->checked() << ' ' << pr[i] << endl;
@@ -36,7 +36,7 @@ struct Mywin : z::AsciiWindow
 		bool tf;
 		ifstream f{home + "/Dropbox/precepts.txt"};
 		string s;
-		for(int i=0; i<7; i++) f >> tf, getline(f, s), C[i]->checked(tf), *this << *C[i];
+		for(int i=0; i<7; i++) f >> tf, getline(f, s), C[i]->checked(tf), update(*C[i]);
 		cv::moveWindow(title_, 700, 500);
 	}
 };
@@ -44,5 +44,6 @@ struct Mywin : z::AsciiWindow
 int main()
 {
 	Mywin win;
+	win.show();
 	win.loop();
 }

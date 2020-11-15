@@ -33,3 +33,10 @@ void z::Button::repaint(cv::Vec3b color)
 	shade_rect({0, 0, width, height}, 3, color);
 	label();
 }
+
+void z::Button::text(string s)
+{
+	text_ = s;
+	shade_rect({0, 0, width, height}, 3, widget_color_);
+	label();
+}

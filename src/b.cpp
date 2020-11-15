@@ -98,7 +98,7 @@ private:
 struct PopWin : z::AsciiWindow, z::PopupInterface
 {
 	PopWin() : z::AsciiWindow{R"(
-	W-------------------------------------
+	WInput-------------------------------------
 	|
 	|   L0--------------------------
 	|   |Will you accept?|
@@ -125,16 +125,16 @@ struct Mywin : z::AsciiWindow {
 		|     |0 100 1|           |50|                |
 		|                                             |
 		|     B0------- B1------- B2-----B4-------    |
-		|     |Popup|   |Cancel|  | Quit||123|        |
+		|     |Popup|   |Cancel|  |Quit| |123|        |
     |                                             |
 		|     C0 L2--------                           
 		|     || |check|
 		|
-		|     T0--------
-		|     ||
+		|     T0--------B5-  T1------------B6-
+		|     ||        |▼|||            B7-
 		|
-		|     I0---------------------
-		|     ||
+		|     I0---------------------  T2----------B8-
+		|     ||                       ||          ||
 		|     |
 		|     |
 		|     |
@@ -148,18 +148,29 @@ struct Mywin : z::AsciiWindow {
 		|)", 14, 21 }//no tab inside
 	{
 		S[1]->on_change([this](int val) {
-				L[1]->text(to_string(100-val)); *this << *L[1];
-				P[0]->value(100-val); *this << *P[0];
+				L[1]->text(to_string(100-val)); update(*L[1]);
+				P[0]->value(100-val); update(*P[0]);
+				show();
 				});
 		B[0]->click([this]() {cout << (pop.open() ? "Yes" : "No") << endl;});
-		B[1]->click([this]() {L[0]->text(to_string(S[0]->value())); *this << *L[0];});
+		B[1]->click([this]() {L[0]->text(to_string(S[0]->value())); update(*L[0]);});
 		B[2]->click([this]() {close();});
 		B[3]->click([this]() {cout << "3" << endl;});
+		B[4]->click([this]() {cout << cv::getWindowProperty(pop.title(), cv::WND_PROP_VISIBLE) << endl;});
+		tie("choose 2", *T[0], *B[5], {"text", "hello", "fjdkl", "fjdk"});
+		L[0]->text("\u2776"); update(*L[0]);
 		C[0]->on_change([this](bool checked) {L[2]->text( checked ? "On" : "Off"); *this << *L[2];});
+		B[6]->text("\u25b5"); B[7]->text("\u25bf"); update(*B[6]); update(*B[7]);
+		T[1]->value("0"); update(*T[1]);
+		B[6]->click([this](){T[1]->value(to_string(stoi(T[1]->value()) + 1)); *this << *T[1];});
+		B[7]->click([this](){T[1]->value(to_string(stoi(T[1]->value()) - 1)); *this << *T[1];});
 		start();//namedWindow should be called before updating (*this << *I[0])
-		*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); *this << *I[0];
-		*this + bt_; *this << bt_;
-		P[0]->value(50); *this << *P[0];
+		*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); update(*I[0]);
+		*this + bt_; update(bt_);
+		P[0]->value(50); update(*P[0]);
+		tie("choose one", *T[2], *B[8], {"hello", "tehi", "is"});
+		update(*B[8]);
+		show();
 	}
 
 	z::Button bt_{"by", {0,0, 50, 50}};

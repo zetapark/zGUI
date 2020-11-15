@@ -23,7 +23,8 @@ public:
 
 protected:
 	static const cv::Vec3b background_color_, widget_color_, highlight_color_, click_color_;
-	void shade_rect(cv::Rect2i r, int shade = 3, cv::Vec3b color = widget_color_);
+	void shade_rect(cv::Rect2i r, int shade = 3, cv::Vec3b color = widget_color_,
+			cv::Vec3b upper_left = highlight_color_, cv::Vec3b lower_right = click_color_);
 	bool focus_ = false;
 	static cv::Ptr<cv::freetype::FreeType2> ft2_;
 };
@@ -43,6 +44,7 @@ class Button : public Widget
 public:
 	Button(std::string text, cv::Rect_<int> r);
 	void click(std::function<void()> f);
+	void text(std::string s);
 protected:
 	std::string text_;
 private:
@@ -64,6 +66,20 @@ private:
 	int r_;
 };
 
+class TextInput : public Widget
+{
+public:
+	TextInput(cv::Rect2i r);
+	std::string value();
+	void value(std::string s);
+	void enter(std::function<void(std::string)> f);
+protected:
+	std::string value_;
+private:
+	void key_event(int key, int);
+	const cv::Vec3b white = cv::Vec3b{255, 255, 255};
+};
+
 class Window : public Widget
 {
 public:
@@ -76,7 +92,9 @@ public:
 	void close();
 	void start(int flag = cv::WINDOW_NORMAL | cv::WINDOW_KEEPRATIO);
 	void keyboard_callback(int key);
-
+	void update(const Widget &r);
+	std::string title();
+	void tie(std::string title, TextInput &t, Button &b, std::vector<std::string> v);
 protected:
 	std::string title_;
 	std::vector<Widget*> widgets_;
@@ -87,19 +105,6 @@ class Image : public Widget
 public:
 	Image(cv::Rect2i r);
 	cv::Mat &operator=(const cv::Mat &r);
-};
-
-class TextInput : public Widget
-{
-public:
-	TextInput(cv::Rect2i r);
-	std::string value();
-	void enter(std::function<void(std::string)> f);
-protected:
-	std::string value_;
-private:
-	void key_event(int key, int);
-	const cv::Vec3b white = cv::Vec3b{255, 255, 255};
 };
 
 class Slider : public Widget

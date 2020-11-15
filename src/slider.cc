@@ -19,16 +19,17 @@ z::Slider::Slider(cv::Rect2i r, int start, int end, int step) : z::Widget{r}
 void z::Slider::draw()
 {
 	mat_ = background_color_;
+	int r = min(width, height) / 3;
 	if(width > height) {
-		cv::line(mat_, {10, height / 2}, {width - 11, height / 2}, {100, 100, 100});
-		cv::circle(mat_, {to_pos(value_), height / 2}, 10, widget_color_, -1);
-		cv::ellipse(mat_, {to_pos(value_), height / 2}, {10,10}, 135, 0, 180, highlight_color_, 2);
-		cv::ellipse(mat_, {to_pos(value_), height / 2}, {10,10}, 315, 0, 180, click_color_, 2);
+		cv::line(mat_, {10, height / 2}, {width - 11, height / 2}, {100, 100, 100}, 2);
+		cv::circle(mat_, {to_pos(value_), height / 2}, r, widget_color_, -1);
+		cv::ellipse(mat_, {to_pos(value_), height / 2}, {r,r}, 135, 0, 180, highlight_color_, 2);
+		cv::ellipse(mat_, {to_pos(value_), height / 2}, {r,r}, 315, 0, 180, click_color_, 2);
 	} else {
-		cv::line(mat_, {width / 2, 10}, {width / 2, height - 11}, {100, 100, 100});
-		cv::circle(mat_, {width / 2, to_pos(value_)}, 10, widget_color_, -1);
-		cv::ellipse(mat_, {width / 2, to_pos(value_)}, {10,10}, 135, 0, 180, highlight_color_, 2);
-		cv::ellipse(mat_, {width / 2, to_pos(value_)}, {10,10}, 315, 0, 180, click_color_, 2);
+		cv::line(mat_, {width / 2, 10}, {width / 2, height - 11}, {100, 100, 100}, 2);
+		cv::circle(mat_, {width / 2, to_pos(value_)}, r, widget_color_, -1);
+		cv::ellipse(mat_, {width / 2, to_pos(value_)}, {r,r}, 135, 0, 180, highlight_color_, 2);
+		cv::ellipse(mat_, {width / 2, to_pos(value_)}, {r,r}, 315, 0, 180, click_color_, 2);
 	}
 }
 

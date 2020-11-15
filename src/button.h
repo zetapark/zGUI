@@ -1,7 +1,9 @@
 #include<map>
+#include<type_traits>
 #include<functional>
 #include<opencv2/highgui.hpp>
 #include<opencv2/freetype.hpp>
+#include<opencv2/imgproc.hpp>
 #define EVENT_ENTER 8000
 #define EVENT_LEAVE 8001
 #define EVENT_KEYBOARD 8002
@@ -95,6 +97,32 @@ public:
 	void update(const Widget &r);
 	std::string title();
 	void tie(std::string title, TextInput &t, Button &b, std::vector<std::string> v);
+	void tie(TextInput &t, Button &b1, Button &b2, double start = 0, double step = 1);
+	template<class... T> void tie(T&... checks)
+	{//radio button
+		static std::vector<z::CheckBox*> v;
+		int k = sizeof...(checks);
+		int sz = v.size();
+		(v.push_back(&checks), ...);
+		for(int i=sz; i < sz + k; i++) v[i]->on_change([i, k, sz, this, &v](bool) {
+					for(int j=sz; j < sz + k; j++) {
+						if(i != j) v[j]->checked(false);
+						else v[j]->checked(true);
+						*this << *v[j];
+					}
+				});
+	}
+	template<class... T, int N=10> void wrap(std::string title, const T&... widgets)
+	{
+		std::vector<int> xs, ys;
+		(xs.push_back(widgets.x), ...);
+		(xs.push_back(widgets.br().x), ...);
+		(ys.push_back(widgets.y), ...);
+		(ys.push_back(widgets.br().y), ...);
+		auto p = std::minmax_element(xs.begin(), xs.end());
+		auto q = std::minmax_element(ys.begin(), ys.end());
+		cv::rectangle(mat_, {*p.first - N, *q.first - N}, {*p.second + N, *q.second + N}, {100,100,100}, 1);
+	}
 protected:
 	std::string title_;
 	std::vector<Widget*> widgets_;

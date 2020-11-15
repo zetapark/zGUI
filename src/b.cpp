@@ -127,8 +127,8 @@ struct Mywin : z::AsciiWindow {
 		|     B0------- B1------- B2-----B4-------    |
 		|     |Popup|   |Cancel|  |Quit| |123|        |
     |                                             |
-		|     C0 L2--------                           
-		|     || |check|
+		|     C0 L2--------  C1-  C2- C3 C4 C5                         
+		|     || |check|     ||   ||  || || ||
 		|
 		|     T0--------B5-  T1------------B6-
 		|     ||        |▼|||            B7-
@@ -159,9 +159,8 @@ struct Mywin : z::AsciiWindow {
 		B[4]->click([this]() {cout << cv::getWindowProperty(pop.title(), cv::WND_PROP_VISIBLE) << endl;});
 		tie("choose 2", *T[0], *B[5], {"text", "hello", "fjdkl", "fjdk"});
 		L[0]->text("\u2776"); update(*L[0]);
-		C[0]->on_change([this](bool checked) {L[2]->text( checked ? "On" : "Off"); *this << *L[2];});
-		B[6]->text("\u25b5"); B[7]->text("\u25bf"); update(*B[6]); update(*B[7]);
-		T[1]->value("0"); update(*T[1]);
+		//C[0]->on_change([this](bool checked) {L[2]->text( checked ? "On" : "Off"); *this << *L[2];});
+		tie(*T[1], *B[6], *B[7]);
 		B[6]->click([this](){T[1]->value(to_string(stoi(T[1]->value()) + 1)); *this << *T[1];});
 		B[7]->click([this](){T[1]->value(to_string(stoi(T[1]->value()) - 1)); *this << *T[1];});
 		start();//namedWindow should be called before updating (*this << *I[0])
@@ -170,6 +169,10 @@ struct Mywin : z::AsciiWindow {
 		P[0]->value(50); update(*P[0]);
 		tie("choose one", *T[2], *B[8], {"hello", "tehi", "is"});
 		update(*B[8]);
+		tie(*C[0], *C[1], *C[2]);
+		tie(*C[3], *C[4], *C[5]);
+		wrap(string{"hlll"},*C[3], *C[4], *C[5]);
+		wrap(string{"hsll"},*B[0], *B[1], *B[2], *B[4]);
 		show();
 	}
 

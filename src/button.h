@@ -104,7 +104,7 @@ public:
 		int k = sizeof...(checks);
 		int sz = v.size();
 		(v.push_back(&checks), ...);
-		for(int i=sz; i < sz + k; i++) v[i]->on_change([i, k, sz, this, &v](bool) {
+		for(int i=sz; i < sz + k; i++) v[i]->on_change([i, k, sz, this](bool) {
 					for(int j=sz; j < sz + k; j++) {
 						if(i != j) v[j]->checked(false);
 						else v[j]->checked(true);
@@ -112,7 +112,7 @@ public:
 					}
 				});
 	}
-	template<class... T, int N=10> void wrap(std::string title, const T&... widgets)
+	template<class... T> void wrap(const char* title, int font, int N, const T&... widgets)
 	{
 		std::vector<int> xs, ys;
 		(xs.push_back(widgets.x), ...);
@@ -121,7 +121,12 @@ public:
 		(ys.push_back(widgets.br().y), ...);
 		auto p = std::minmax_element(xs.begin(), xs.end());
 		auto q = std::minmax_element(ys.begin(), ys.end());
-		cv::rectangle(mat_, {*p.first - N, *q.first - N}, {*p.second + N, *q.second + N}, {100,100,100}, 1);
+		cv::Point2i ul = {*p.first -N, *q.first -N};
+		cv::rectangle(mat_, ul, {*p.second + N, *q.second + N}, {100,100,100}, 1);
+		int base = 0;
+		auto sz = ft2_->getTextSize(title, font, -1, &base);
+		cv::line(mat_, {ul.x + 20, ul.y}, {ul.x + sz.width + 40, ul.y}, background_color_, 1);
+		ft2_->putText(mat_, title, {ul.x + 30, ul.y - 5 - font / 2}, font, {0,0,0}, -1, 4, false);
 	}
 protected:
 	std::string title_;

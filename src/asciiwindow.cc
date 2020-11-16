@@ -111,8 +111,10 @@ bool z::AsciiWindow::parse_widget_area(int y, int x)
 								S.emplace_back(make_shared<z::Slider>(r, a, b, c)); }
 							break;
 		case 'C': C.emplace_back(make_shared<z::CheckBox>(r)); break;
-		case 'T': T.emplace_back(make_shared<z::TextInput>(r)); break;
-		case 'I': I.emplace_back(make_shared<z::Image>(r)); break;
+		case 'T': T.emplace_back(make_shared<z::TextInput>(r)); T.back()->value(text); break;
+		case 'I': I.emplace_back(make_shared<z::Image>(r));
+							if(text != "") *I.back() = cv::imread(text);
+							break;
 		case 'P': P.emplace_back(make_shared<z::Progress>(r)); break;
 	}
 	return true;

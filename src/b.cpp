@@ -127,14 +127,15 @@ struct Mywin : z::AsciiWindow {
 		|     B0------- B1------- B2-----B4-------    |
 		|     |Popup|   |Cancel|  |Quit| |123|        |
     |                                             |
+		|
 		|     C0 L2--------  C1-  C2- C3 C4 C5                         
 		|     || |check|     ||   ||  || || ||
 		|
 		|     T0--------B5-  T1------------B6-
-		|     ||        |▼|||            B7-
+		|     ||        ||   ||            B7-
 		|
 		|     I0---------------------  T2----------B8-
-		|     ||                       ||          ||
+		|     |11.jpg|                 ||          ||
 		|     |
 		|     |
 		|     |
@@ -142,8 +143,8 @@ struct Mywin : z::AsciiWindow {
 		|     |                         P0-------------------
 		|     |                         ||
 		|     |
-		|     |
-		|     |
+		|     |                          T3------------
+		|     |                          |hello|
 		|     |
 		|)", 14, 21 }//no tab inside
 	{
@@ -164,15 +165,15 @@ struct Mywin : z::AsciiWindow {
 		B[6]->click([this](){T[1]->value(to_string(stoi(T[1]->value()) + 1)); *this << *T[1];});
 		B[7]->click([this](){T[1]->value(to_string(stoi(T[1]->value()) - 1)); *this << *T[1];});
 		start();//namedWindow should be called before updating (*this << *I[0])
-		*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); update(*I[0]);
+		//*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); update(*I[0]);
 		*this + bt_; update(bt_);
 		P[0]->value(50); update(*P[0]);
 		tie("choose one", *T[2], *B[8], {"hello", "tehi", "is"});
 		update(*B[8]);
 		tie(*C[0], *C[1], *C[2]);
 		tie(*C[3], *C[4], *C[5]);
-		wrap(string{"hlll"},*C[3], *C[4], *C[5]);
-		wrap(string{"hsll"},*B[0], *B[1], *B[2], *B[4]);
+		wrap("hlll", 25, 10, *C[3], *C[4], *C[5]);
+		wrap("hsll", 25, 10, *B[0], *B[1], *B[2], *B[4]);
 		show();
 	}
 

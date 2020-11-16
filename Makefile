@@ -6,7 +6,7 @@ all :
 		if [ $$i == "obj/" ]; then continue; fi; \
 		if [ -f $${i}/Makefile ]; then make -j 8 -C $$i; fi;\
 	done
-	make -C obj/
+	make -j 8 -C obj/
 	./catch
 
 clean :

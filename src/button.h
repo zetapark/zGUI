@@ -65,7 +65,6 @@ protected:
 	bool checked_ = false;
 private:
 	void click(int, int);
-	int r_;
 };
 
 class TextInput : public Widget
@@ -113,7 +112,7 @@ public:
 				});
 	}
 	template<class... T> void wrap(const char* title, int font, int N, const T&... widgets)
-	{
+	{//N : margin, font : font height
 		std::vector<int> xs, ys;
 		(xs.push_back(widgets.x), ...);
 		(xs.push_back(widgets.br().x), ...);
@@ -124,9 +123,11 @@ public:
 		cv::Point2i ul = {*p.first -N, *q.first -N};
 		cv::rectangle(mat_, ul, {*p.second + N, *q.second + N}, {100,100,100}, 1);
 		int base = 0;
-		auto sz = ft2_->getTextSize(title, font, -1, &base);
-		cv::line(mat_, {ul.x + 20, ul.y}, {ul.x + sz.width + 40, ul.y}, background_color_, 1);
-		ft2_->putText(mat_, title, {ul.x + 30, ul.y - 5 - font / 2}, font, {0,0,0}, -1, 4, false);
+		if(title != "") {
+			auto sz = ft2_->getTextSize(title, font, -1, &base);
+			cv::line(mat_, {ul.x + 20, ul.y}, {ul.x + sz.width + 40, ul.y}, background_color_, 1);
+			ft2_->putText(mat_, title, {ul.x + 30, ul.y - 5 - font / 2}, font, {0,0,0}, -1, 4, false);
+		}
 	}
 protected:
 	std::string title_;

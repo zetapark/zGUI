@@ -23,6 +23,7 @@ void z::Window::tie(string title, z::TextInput &t, z::Button &b, vector<string> 
 	static vector<shared_ptr<Tie>> vw;
 	vw.emplace_back(make_shared<Tie>(title, v));
 	b.text("\u25bc");
+	update(b);
 	int k = vw.size()-1;
 	b.click([&, k](){t.value(vw[k]->open()); *this << t;});
 }

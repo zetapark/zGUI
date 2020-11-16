@@ -128,9 +128,13 @@ struct Mywin : z::AsciiWindow {
 		|     |Popup|   |Cancel|  |Quit| |123|        |
     |                                             |
 		|
-		|     C0 L2--------  C1-  C2- C3 C4 C5                         
-		|     || |check|     ||   ||  || || ||
-		|
+		|     C0 L2--------  C3 C4 C5                         
+		|     || |check|     || || ||
+		|     C1 L3----- 
+		|     || |우리는|
+		|     C2 L4----          C6
+		|     || |사나이|     ||
+		|                        
 		|     T0--------B5-  T1------------B6-
 		|     ||        ||   ||            B7-
 		|
@@ -174,6 +178,7 @@ struct Mywin : z::AsciiWindow {
 		tie(*C[3], *C[4], *C[5]);
 		wrap("hlll", 25, 10, *C[3], *C[4], *C[5]);
 		wrap("hsll", 25, 10, *B[0], *B[1], *B[2], *B[4]);
+		wrap("check", 25, 10, *C[0], *C[1], *C[2], *L[2], *L[3], *L[4]);
 		show();
 	}
 

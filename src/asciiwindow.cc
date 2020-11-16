@@ -81,11 +81,11 @@ int z::AsciiWindow::get_size(char c)
 	}
 }
 
-array<int, 3> get_slider_param(const string &s, int pos)
+array<int, 3> get_slider_param(string s)
 {//start stop step -> int
 	array<int, 3> r;
 	stringstream ss;
-	ss << s.substr(pos);
+	ss << s;
 	ss >> r[0] >> r[1] >> r[2];
 	return r;
 }
@@ -107,7 +107,7 @@ bool z::AsciiWindow::parse_widget_area(int y, int x)
 	switch(art_[y][x]) {
 		case 'B': B.emplace_back(make_shared<z::Button>(text, r)); break;
 		case 'L': L.emplace_back(make_shared<z::Label>(text, r)); break;
-		case 'S': { auto [a, b, c] = get_slider_param(art_[y+1], x+1);
+		case 'S': { auto [a, b, c] = get_slider_param(text);
 								S.emplace_back(make_shared<z::Slider>(r, a, b, c)); }
 							break;
 		case 'C': C.emplace_back(make_shared<z::CheckBox>(r)); break;

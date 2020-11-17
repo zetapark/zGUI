@@ -19,19 +19,19 @@ struct Tie : z::Popup {
 	}
 	vector<shared_ptr<z::Button>> bts;
 	vector<string> v;
-	string open() {
-		return v[z::Popup::open()];
+	string open(int x, int y) {
+		return v[z::Popup::open(cv::WINDOW_AUTOSIZE, x, y)];
 	}
 };
 
-void z::Window::tie(string title, int font, z::TextInput &t, z::Button &b, vector<string> v)
+void z::Window::tie(string title, int font, z::TextInput &t, z::Button &b, vector<string> v, int x, int y)
 {//combobox
 	static vector<shared_ptr<Tie>> vw;
 	vw.emplace_back(make_shared<Tie>(title, font, v));
 	b.text("\u25bc");
 	update(b);
 	int k = vw.size()-1;
-	b.click([&, k](){t.value(vw[k]->open()); *this << t;});
+	b.click([&, k, x, y](){t.value(vw[k]->open(x, y)); *this << t;});
 }
 
 void z::Window::tie(z::TextInput &t, z::Button &b1, z::Button &b2, double start, double step)

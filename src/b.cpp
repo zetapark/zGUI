@@ -2,7 +2,6 @@
 #include<mutex>
 #include<thread>
 #include<iostream>
-#include<opencv2/imgproc.hpp>
 #include"asyncq.h"
 #include"button.h"
 using namespace std;

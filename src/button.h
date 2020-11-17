@@ -95,7 +95,7 @@ public:
 	void keyboard_callback(int key);
 	void update(const Widget &r);
 	std::string title();
-	void tie(std::string title, int font, TextInput &t, Button &b, std::vector<std::string> v);
+	void tie(std::string title, int font, TextInput &t, Button &b, std::vector<std::string> v, int x = -1, int y = -1);
 	void tie(TextInput &t, Button &b1, Button &b2, double start = 0, double step = 1);
 	template<class... T> void tie(T&... checks)
 	{//radio button
@@ -195,7 +195,7 @@ private:
 class PopupInterface {
 public:
 	PopupInterface(Window *p);
-	int open(int flag = cv::WINDOW_AUTOSIZE);
+	int open(int flag = cv::WINDOW_AUTOSIZE, int x = -1, int y = -1);
 	void quit(int r);
 protected:
 	bool closed_ = false;

@@ -8,9 +8,10 @@ z::PopupInterface::PopupInterface(z::Window *p)
 	window_ptr_ = p;
 }
 
-int z::PopupInterface::open(int flag)
+int z::PopupInterface::open(int flag, int x, int y)
 {
 	window_ptr_->start(flag);
+	if(x >= 0 && y >= 0) cv::moveWindow(window_ptr_->title(), x, y);
 	while(!closed_) if(int key = cv::waitKey(10); key != -1) window_ptr_->keyboard_callback(key);
 	closed_ = false;
 	return result_;

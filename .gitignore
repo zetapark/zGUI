@@ -1,4 +1,6 @@
 catch
+*.png
+*.jpg
 .*
 !/.gitignore
 core

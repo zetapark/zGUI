@@ -2,10 +2,16 @@
 using namespace std;
 
 struct Tie : z::Popup {
-	Tie(string title, vector<string> v) : z::Popup{title, {0, 0, 300, 30 * v.size()}} {
+	Tie(string title, int font, vector<string> v) : z::Popup{title, {0, 0, 300, font * v.size()}} {
 		this->v = v;
+		int length = 0;
+		for(int i=0, base=0; i<v.size(); i++) {
+			int k = ft2_->getTextSize(v[i], font, -1, &base).width;
+			if(length < k) length = k;
+		}
+		cv::resize(mat_, mat_, {length, font * v.size()});
 		for(int i=0; i<v.size(); i++) {
-			bts.emplace_back(make_shared<z::Button>(v[i], cv::Rect2i{0, i*30, 300, 30})); 
+			bts.emplace_back(make_shared<z::Button>(v[i], cv::Rect2i{0, i*font, length, 30})); 
 			bts.back()->click([i, this](){quit(i);});
 			*this + *bts.back();
 			update(*bts.back());
@@ -18,10 +24,10 @@ struct Tie : z::Popup {
 	}
 };
 
-void z::Window::tie(string title, z::TextInput &t, z::Button &b, vector<string> v)
+void z::Window::tie(string title, int font, z::TextInput &t, z::Button &b, vector<string> v)
 {//combobox
 	static vector<shared_ptr<Tie>> vw;
-	vw.emplace_back(make_shared<Tie>(title, v));
+	vw.emplace_back(make_shared<Tie>(title, font, v));
 	b.text("\u25bc");
 	update(b);
 	int k = vw.size()-1;

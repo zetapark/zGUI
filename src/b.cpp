@@ -162,7 +162,7 @@ struct Mywin : z::AsciiWindow {
 		B[2]->click([this]() {close();});
 		B[3]->click([this]() {cout << "3" << endl;});
 		B[4]->click([this]() {cout << cv::getWindowProperty(pop.title(), cv::WND_PROP_VISIBLE) << endl;});
-		tie("choose 2", *T[0], *B[5], {"text", "hello", "fjdkl", "fjdk"});
+		tie("choose 2", 30, *T[0], *B[5], {"text", "hello", "fjdkl", "fjdk", "우리는 사나이 진짜"});
 		L[0]->text("\u2776"); update(*L[0]);
 		//C[0]->on_change([this](bool checked) {L[2]->text( checked ? "On" : "Off"); *this << *L[2];});
 		tie(*T[1], *B[6], *B[7]);
@@ -172,7 +172,7 @@ struct Mywin : z::AsciiWindow {
 		//*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); update(*I[0]);
 		*this + bt_; update(bt_);
 		P[0]->value(50); update(*P[0]);
-		tie("choose one", *T[2], *B[8], {"hello", "tehi", "is"});
+		tie("choose one", 30, *T[2], *B[8], {"hello", "tehi", "is"});
 		update(*B[8]);
 		tie(*C[0], *C[1], *C[2]);
 		tie(*C[3], *C[4], *C[5]);

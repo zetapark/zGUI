@@ -16,14 +16,18 @@ struct Mywin : z::AsciiWindow
 	| B0-----     S1----------------- L2--
 	| |Quit|      |0 200 1|           |0|
 	|
-	| L3----- S2-------------------- L4----
-	| |Rotate||0 360 3|              |0|
+	| L3-----   T1-------B4
+	| |Rotate|  ||       B5
+	|
+	| B3---------------
+	| |Detect Contours|
 	|)", 15, 21}
 	{
 		for(const filesystem::path &p : filesystem::directory_iterator("./"))
 			if(is_regular_file(p) && p.extension() == ".png" || p.extension() == ".jpg")
 				v.push_back(p.filename());
 		tie("open file", 30, *T[0], *B[1], v, 700, 150);//make combobox
+		tie(*T[1], *B[4], *B[5], 0, 1);
 		wrap("Edge Detection", 20, 10, *S[0], *S[1], *L[1], *L[2]);
 		start(cv::WINDOW_AUTOSIZE);
 		cv::moveWindow(title_, 500, 100);
@@ -54,18 +58,24 @@ struct Mywin : z::AsciiWindow
 			*this << *L[2];
 			m.show();
 		} );
-		S[2]->on_change( [this](int val) {
+		T[1]->enter( [this](std::string val) {
 			m.restore();
-			m.rotate(val);
+			m.rotate(stod(val));
 			m.show();
-			L[4]->text(to_string(val));
-			*this << *L[4];
 		} );
 		B[2]->click( [this]() {
 			m = cv::imread(T[0]->value());
 			m.show();
-			m.move_window(500, 400);
+			m.move_window(500, height + 150);
 			m.save();
+		} );
+		B[3]->click( [this]() {
+			m.restore();
+			m.gray();
+			m.detect_contours();
+			m.restore();
+			m.draw_detected_contours();
+			m.show();
 		} );
 	}
 

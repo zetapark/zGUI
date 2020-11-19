@@ -11,7 +11,6 @@ class CVMat : public cv::Mat
 public:
 	CVMat(const cv::Mat& r);
 	CVMat() = default;
-	operator cv::Mat();
 	void filter(const Mat& m);//apply kernel
 	void show(std::string title="OpenCV");
 	void move_window(int x, int y);

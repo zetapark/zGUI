@@ -6,6 +6,9 @@ using namespace std;
 
 struct Mywin : z::AsciiWindow
 {
+	CVMat m = cv::imread("Lenna.jpg");
+	vector<string> v;
+
 	Mywin() : z::AsciiWindow{R"(
 	WLenna Test-----------------------------
 	| T0----------------------B1- B2------
@@ -16,8 +19,8 @@ struct Mywin : z::AsciiWindow
 	| B0-----     S1----------------- L2--
 	| |Quit|      |0 200 1|           |0|
 	|
-	| L3-----   T1-------B4
-	| |Rotate|  ||       B5
+	| L3-----   T1--------------B4
+	| |Rotate|  ||              B5
 	|
 	| B3---------------
 	| |Detect Contours|
@@ -78,9 +81,6 @@ struct Mywin : z::AsciiWindow
 			m.show();
 		} );
 	}
-
-	CVMat m = cv::imread("Lenna.jpg");
-	vector<string> v;
 };
 
 int main()

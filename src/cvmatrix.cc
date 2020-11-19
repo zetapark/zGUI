@@ -247,13 +247,6 @@ void CVMat::draw_detected_face()
 	for(auto& a : faces_) rectangle(*this, a, {0,0,255});
 }
 
-CVMat::operator cv::Mat() 
-{
-	Mat r;
-	r = *this;
-	return r;
-}
-
 MatND CVMat::histo(string window)
 {
 	int histSize[] = {256}; // hue varies from 0 to 179, see cvtColor 

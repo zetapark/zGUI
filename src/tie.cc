@@ -39,7 +39,7 @@ void z::Window::tie(z::TextInput &t, z::Button &b1, z::Button &b2, double start,
 	b1.text("\u25b5"); b2.text("\u25bf");
 	t.value(to_string(start));
 	update(b1); update(b2); update(t);
-	b1.click([&](){t.value(to_string(stoi(t.value()) + step)); *this << t;});
-	b2.click([&](){t.value(to_string(stoi(t.value()) - step)); *this << t;});
+	b1.click([&, step](){t.value(to_string(stod(t.value()) + step)); *this << t;});
+	b2.click([&, step](){t.value(to_string(stod(t.value()) - step)); *this << t;});
 }
 

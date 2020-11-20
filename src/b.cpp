@@ -164,9 +164,7 @@ struct Mywin : z::AsciiWindow {
 		tie("choose 2", 30, *T[0], *B[5], {"text", "hello", "fjdkl", "fjdk", "우리는 사나이 진짜"});
 		L[0]->text("\u2776"); update(*L[0]);
 		//C[0]->on_change([this](bool checked) {L[2]->text( checked ? "On" : "Off"); *this << *L[2];});
-		tie(*T[1], *B[6], *B[7]);
-		B[6]->click([this](){T[1]->value(to_string(stoi(T[1]->value()) + 1)); *this << *T[1];});
-		B[7]->click([this](){T[1]->value(to_string(stoi(T[1]->value()) - 1)); *this << *T[1];});
+		tie(*T[1], *B[6], *B[7], 0, 1);
 		start();//namedWindow should be called before updating (*this << *I[0])
 		//*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); update(*I[0]);
 		*this + bt_; update(bt_);

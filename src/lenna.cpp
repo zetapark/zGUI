@@ -4,37 +4,83 @@
 #include"button.h"
 using namespace std;
 
+struct Pop : z::AsciiWindow, z::PopupInterface
+{
+	Pop()
+		: z::PopupInterface{this}
+		, z::AsciiWindow{R"(
+			WReally?--------------
+			|
+			|  B0-----   B1-----
+			|  |Yes|     |No|
+			|)", 15, 21}
+	{
+		B[0]->click([this](){quit(1);});
+		B[1]->click([this](){quit(0);});
+	}
+};
+
+struct Message : z::AsciiWindow, z::PopupInterface
+{
+	Message()
+		: z::PopupInterface{this}
+		, z::AsciiWindow{R"(
+			W메세지--------------------
+			|
+			|   L0--------------------
+			|   ||
+			|   L1--------------------
+			|   ||
+			|
+			|        B0------
+			|        |OK|
+			|
+			|)", 15, 21}
+	{
+		B[0]->click([this]() {quit(1);});
+	}
+	void set(string s1, string s2)
+	{
+		L[0]->text(s1); L[1]->text(s2);
+		update(*L[0]); update(*L[1]);
+	}
+};
+
 struct Mywin : z::AsciiWindow
 {
+	Pop pop;
+	Message msg;
 	CVMat m = cv::imread("Lenna.jpg");
 	vector<string> v;
 
-	Mywin() : z::AsciiWindow{R"(
-	WLenna Test-----------------------------
-	| T0----------------------B1- B2------
-	| |open file|             ||  |open|
-	|
-	| C0 L0-----  S0----------------- L1--
-	| || |gray|   |0 100 1|           |0|
-	| B0-----     S1----------------- L2--
-	| |Quit|      |0 200 1|           |0|
-	|
-	| L3-----   T1--------------B4
-	| |Rotate|  ||              B5
-	|
-	| B3---------------
-	| |Detect Contours|
-	|)", 15, 21}
-	{
+	Mywin()
+		: z::AsciiWindow{R"(
+			WLenna Test-----------------------------
+			| T0----------------------B1- B2------
+			| |open file|             ||  |open|
+			|
+			| C0 L0-----  S0----------------- L1--
+			| || |gray|   |0 100 1|           |0|
+			| B0-----     S1----------------- L2--
+			| |Quit|      |0 200 1|           |0|
+			|
+			| L3-----   T1--------------B4
+			| |Rotate|  ||              B5
+			|
+			| B3---------------   B6----------
+			| |Detect Contours|   |Fourier|
+			|)", 15, 21}//no tabs should be used inside ascii art
+	{//constructor starts here
 		for(const filesystem::path &p : filesystem::directory_iterator("./"))
 			if(is_regular_file(p) && p.extension() == ".png" || p.extension() == ".jpg")
 				v.push_back(p.filename());
 		tie("open file", 30, *T[0], *B[1], v, 700, 150);//make combobox
-		tie(*T[1], *B[4], *B[5], 0, 1);
+		tie(*T[1], *B[4], *B[5], 0, 1);//make dial box
 		wrap("Edge Detection", 20, 10, *S[0], *S[1], *L[1], *L[2]);
 		start(cv::WINDOW_AUTOSIZE);
 		cv::moveWindow(title_, 500, 100);
-		B[0]->click([this](){cv::destroyAllWindows();});
+
+		B[0]->click([this](){if(pop.open(cv::WINDOW_AUTOSIZE, 600, 200)) cv::destroyAllWindows();});
 		C[0]->on_change( [this](bool t) {
 			if(t) {
 				m.restore();
@@ -62,7 +108,6 @@ struct Mywin : z::AsciiWindow
 			m.show();
 		} );
 		T[1]->enter( [this](std::string val) {
-			m.restore();
 			m.rotate(stod(val));
 			m.show();
 		} );
@@ -79,6 +124,12 @@ struct Mywin : z::AsciiWindow
 			m.restore();
 			m.draw_detected_contours();
 			m.show();
+		} );
+		B[6]->click( [this]() {
+			if(m.channels() != 1) {
+				msg.set("푸리엔 변환은", "1 채널이어야 합니다.");
+				msg.open();
+			} else m.fourier();
 		} );
 	}
 };

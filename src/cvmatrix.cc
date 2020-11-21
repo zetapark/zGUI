@@ -1,3 +1,4 @@
+#include<iostream>
 #include<tuple>
 #include<cmath>
 #include<complex>
@@ -270,52 +271,56 @@ MatND CVMat::histo(string window)
 	return hist;
 }
 
-void CVMat::fourier(string window)
+void CVMat::dft_shuffle()
 {
 	using namespace cv;
-    Mat padded;                            //expand input image to optimal size
-    int m = getOptimalDFTSize( rows );
-    int n = getOptimalDFTSize( cols ); // on the border add zero values
-    copyMakeBorder(*this, padded, 0,m-rows,0,n-cols, BORDER_CONSTANT, Scalar::all(0));
+	int cx = cols/2;
+	int cy = rows/2;
 
-    Mat planes[] = {Mat_<float>(padded), Mat::zeros(padded.size(), CV_32F)};
-    Mat complexI;
-    merge(planes, 2, complexI);  // Add to the expanded another plane with zeros
+	Mat q0(*this, Rect(0, 0, cx, cy));   // Top-Left - Create a ROI per quadrant
+	Mat q1(*this, Rect(cx, 0, cx, cy));  // Top-Right
+	Mat q2(*this, Rect(0, cy, cx, cy));  // Bottom-Left
+	Mat q3(*this, Rect(cx, cy, cx, cy)); // Bottom-Right
 
-    dft(complexI, complexI);     // this way the result may fit in the source matrix
+	Mat tmp;                           // swap quadrants (Top-Left with Bottom-Right)
+	q0.copyTo(tmp);
+	q3.copyTo(q0);
+	tmp.copyTo(q3);
 
-    // compute the magnitude and switch to logarithmic scale
-    // => log(1 + sqrt(Re(DFT(I))^2 + Im(DFT(I))^2))
-    split(complexI, planes);       // planes[0] = Re(DFT(I), planes[1] = Im(DFT(I))
-    magnitude(planes[0], planes[1], planes[0]);// planes[0] = magnitude
-    Mat magI = planes[0];
+	q1.copyTo(tmp);                    // swap quadrant (Top-Right with Bottom-Left)
+	q2.copyTo(q1);
+	tmp.copyTo(q2);
+}
 
-    magI += Scalar::all(1);                    // switch to logarithmic scale
-    log(magI, magI);
+void CVMat::dft()
+{
+	convertTo(*this, CV_32FC1, 1.0 / 255.0);
+	cv::dft(*this, *this, DFT_COMPLEX_OUTPUT);
+}
 
-    // crop the spectrum, if it has an odd number of rows or columns
-    magI = magI(Rect(0, 0, magI.cols & -2, magI.rows & -2));
+void CVMat::idft()
+{
+	cv::idft(*this, *this, DFT_SCALE | DFT_REAL_OUTPUT);
+}
 
-    // rearrange the quadrants of Fourier image  so that the origin is at the image center
-    int cx = magI.cols/2;
-    int cy = magI.rows/2;
+void CVMat::lowpass()
+{
+	Mat filter(size(), CV_32FC2, Vec2f(0,0));
+	circle(filter, size() / 2, 50, Vec2f(1, 1), -1);
+	multiply(*this, filter, *this);
+}
 
-    Mat q0(magI, Rect(0, 0, cx, cy));   // Top-Left - Create a ROI per quadrant
-    Mat q1(magI, Rect(cx, 0, cx, cy));  // Top-Right
-    Mat q2(magI, Rect(0, cy, cx, cy));  // Bottom-Left
-    Mat q3(magI, Rect(cx, cy, cx, cy)); // Bottom-Right
-
-    Mat tmp;                           // swap quadrants (Top-Left with Bottom-Right)
-    q0.copyTo(tmp);
-    q3.copyTo(q0);
-    tmp.copyTo(q3);
-
-    q1.copyTo(tmp);                    // swap quadrant (Top-Right with Bottom-Left)
-    q2.copyTo(q1);
-    tmp.copyTo(q2);
-
-	cv::normalize(magI, magI, 0, 1, NORM_MINMAX);//Transform the matrix with float values into a
-	imshow(window, magI);
+void CVMat::dft_show(string window)
+{
+	using namespace cv;
+	Mat image_array[2] = { Mat::zeros(size(), CV_32F), Mat::zeros(size(), CV_32F)};
+	split(*this, image_array);
+	Mat mag_image;
+	magnitude(image_array[0], image_array[1], mag_image);
+	mag_image += Scalar::all(1);
+	log(mag_image, mag_image);
+	cv::normalize(mag_image, mag_image, 1, 0, cv::NORM_MINMAX);
+	imshow(window, mag_image);
 }
 
 void CVMat::noise(int scale)
@@ -483,4 +488,24 @@ void CVMat::template_init()
 {
 	feature<ORB>();
 	feature<BRISK>();
+}
+
+void CVMat::slide(int r, int offset) {
+	Mat m(1, cols, type());
+	for(int x=0; x<cols; x++) m.at<char>(1, x) = at<char>(r, x);
+	for(int x=0; x<cols; x++) {
+		int k = x - offset;
+		while(k >= cols) k -= cols;
+		while(k < 0) k += cols;
+		at<char>(r, x) = m.at<char>(1, k);
+	}
+}
+
+void CVMat::tear() {
+	static uniform_int_distribution<> di{-1, 1};
+	static random_device rd;
+	for(int y=0, offset=0; y<rows; y++) {
+		offset += di(rd);
+		slide(y, offset);
+	}
 }

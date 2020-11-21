@@ -1,3 +1,5 @@
+#include<thread>
+#include<cmath>
 #include<filesystem>
 #include<iostream>
 #include"cvmatrix.h"
@@ -55,7 +57,7 @@ struct Mywin : z::AsciiWindow
 
 	Mywin()
 		: z::AsciiWindow{R"(
-			WLenna Test-----------------------------
+			WLenna Test----------------------------------------
 			| T0----------------------B1- B2------
 			| |open file|             ||  |open|
 			|
@@ -64,11 +66,17 @@ struct Mywin : z::AsciiWindow
 			| B0-----     S1----------------- L2--
 			| |Quit|      |0 200 1|           |0|
 			|
-			| L3-----   T1--------------B4
-			| |Rotate|  ||              B5
+			| L3-----   T1--------------B4   B7---  B9------
+			| |Rotate|  ||              B5   |save| |restore|
 			|
 			| B3---------------   B6----------
 			| |Detect Contours|   |Fourier|
+			|
+			| S2-------------------- L4------L5----
+			| |1 100 1|              |quant| ||
+			|
+			| B8-------
+			| |tear|
 			|)", 15, 21}//no tabs should be used inside ascii art
 	{//constructor starts here
 		for(const filesystem::path &p : filesystem::directory_iterator("./"))
@@ -80,7 +88,9 @@ struct Mywin : z::AsciiWindow
 		start(cv::WINDOW_AUTOSIZE);
 		cv::moveWindow(title_, 500, 100);
 
-		B[0]->click([this](){if(pop.open(cv::WINDOW_AUTOSIZE, 600, 200)) cv::destroyAllWindows();});
+		B[0]->click( [this]() {
+			if(pop.open(cv::WINDOW_AUTOSIZE, 600, 200)) cv::destroyAllWindows();
+		} );
 		C[0]->on_change( [this](bool t) {
 			if(t) {
 				m.restore();
@@ -129,7 +139,37 @@ struct Mywin : z::AsciiWindow
 			if(m.channels() != 1) {
 				msg.set("푸리엔 변환은", "1 채널이어야 합니다.");
 				msg.open();
-			} else m.fourier();
+			} else {
+				m.dft();
+				m.dft_shuffle();
+				m.lowpass();
+				m.dft_show("Fourier");
+				m.dft_shuffle();
+				m.idft();
+				m.show("idft");
+			}
+		} );
+		B[7]->click( [this]() { m.save(); } );
+		B[9]->click( [this]() { m.restore(); } );
+		S[2]->on_change( [this](int val) {//정량화
+			m.restore();
+			if(m.channels() != 1) {
+				msg.set("양자변환은", "채널이 1이어야 함.");
+				msg.open();
+			} else {
+				L[5]->text(to_string(val)); *this << *L[5];
+				for(int y = 0; y < m.rows; y++) for(int x = 0; x < m.cols; x++)
+					m.at<char>(y, x) = (m.at<char>(y, x) / val) * val + val / 2;
+				m.show("quant");
+			}
+		} );
+		B[8]->click( [this]() {//tear
+			m.restore();
+			for(int i=0; i<20; i++) {
+				m.tear();
+				m.show("tear");
+				cv::waitKey(30);
+			}
 		} );
 	}
 };

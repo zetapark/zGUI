@@ -55,7 +55,11 @@ public:
 	void draw_detected_line(cv::Scalar color = {0,0,255});
 	void draw_detected_circle(cv::Scalar color = {0,0,255});
 	void draw_detected_face();
-	void fourier(std::string window = "Fourier");//after gray
+	void dft();
+	void idft();
+	void lowpass();
+	void dft_shuffle();
+	void dft_show(std::string window = "Fourier");//after gray
 	cv::MatND histo(std::string windwo = "Histogram");//after gray
 	template<typename T> void feature();
 	void draw_feature();
@@ -66,6 +70,8 @@ public:
 	void transform4(cv::Point2f src[4], cv::Point2f dst[4], cv::Size sz = {0,0});
 	std::vector<cv::Point> get_points(int k);// ^ affine and perspective transform
 	void get_businesscard(std::vector<cv::Point> v);
+	void slide(int row, int offset);
+	void tear();
 	
 protected:
 	cv::Mat save_, harris_, descriptor_;

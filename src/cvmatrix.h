@@ -72,6 +72,7 @@ public:
 	void get_businesscard(std::vector<cv::Point> v);
 	void slide(int row, int offset);
 	void tear();
+	void quantize(int q);
 	
 protected:
 	cv::Mat save_, harris_, descriptor_;

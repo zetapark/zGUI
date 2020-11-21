@@ -491,7 +491,7 @@ void CVMat::template_init()
 }
 
 void CVMat::slide(int r, int offset) {
-	Mat m(1, cols, type());
+	Mat m = cv::Mat::zeros({1, cols}, type());
 	for(int x=0; x<cols; x++) m.at<char>(1, x) = at<char>(r, x);
 	for(int x=0; x<cols; x++) {
 		int k = x - offset;
@@ -499,6 +499,12 @@ void CVMat::slide(int r, int offset) {
 		while(k < 0) k += cols;
 		at<char>(r, x) = m.at<char>(1, k);
 	}
+}
+
+void CVMat::quantize(int q)
+{
+	for(int y = 0; y < rows; y++) for(int x = 0; x < cols; x++)
+		at<char>(y, x) = (at<char>(y, x) / q) * q + q / 2;
 }
 
 void CVMat::tear() {

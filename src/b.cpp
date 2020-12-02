@@ -151,21 +151,10 @@ struct Mywin : z::AsciiWindow {
 		|     |
 		|)", 14, 21 }//no tab inside
 	{
-		S[1]->on_change([this](int val) {
-				L[1]->text(to_string(100-val)); update(*L[1]);
-				P[0]->value(100-val); update(*P[0]);
-				show();
-				});
-		B[0]->click([this]() {cout << (pop.open() ? "Yes" : "No") << endl;});
-		B[1]->click([this]() {L[0]->text(to_string(S[0]->value())); update(*L[0]);});
-		B[2]->click([this]() {close();});
-		B[3]->click([this]() {cout << "3" << endl;});
-		B[4]->click([this]() {cout << cv::getWindowProperty(pop.title(), cv::WND_PROP_VISIBLE) << endl;});
 		tie("choose 2", 30, *T[0], *B[5], {"text", "hello", "fjdkl", "fjdk", "우리는 사나이 진짜"});
 		L[0]->text("\u2776"); update(*L[0]);
 		//C[0]->on_change([this](bool checked) {L[2]->text( checked ? "On" : "Off"); *this << *L[2];});
 		tie(*T[1], *B[6], *B[7], 0, 1);
-		start();//namedWindow should be called before updating (*this << *I[0])
 		//*I[0] = cv::imread("/home/zeta/Pictures/11.jpg"); update(*I[0]);
 		*this + bt_; update(bt_);
 		P[0]->value(50); update(*P[0]);
@@ -176,7 +165,18 @@ struct Mywin : z::AsciiWindow {
 		wrap("hlll", 25, 10, *C[3], *C[4], *C[5]);
 		wrap("hsll", 25, 10, *B[0], *B[1], *B[2], *B[4]);
 		wrap("check", 25, 10, *C[0], *C[1], *C[2], *L[2], *L[3], *L[4]);
-		show();
+		start();//namedWindow should be called before updating (*this << *I[0])
+
+		S[1]->on_change([this](int val) {
+				L[1]->text(to_string(100-val)); update(*L[1]);
+				P[0]->value(100-val); update(*P[0]);
+				show();
+				});
+		B[0]->click([this]() {cout << (pop.open() ? "Yes" : "No") << endl;});
+		B[1]->click([this]() {L[0]->text(to_string(S[0]->value())); update(*L[0]);});
+		B[2]->click([this]() {close();});
+		B[3]->click([this]() {cout << "3" << endl;});
+		B[4]->click([this]() {cout << cv::getWindowProperty(pop.title(), cv::WND_PROP_VISIBLE) << endl;});
 	}
 
 	z::Button bt_{"by", {0,0, 50, 50}};

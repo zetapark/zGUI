@@ -23,6 +23,7 @@ z::Widget::Widget(cv::Rect_<int> r)
 	if(!ft2_) {
 		ft2_ = cv::freetype::createFreeType2();
     ft2_->loadFontData("/usr/share/fonts/truetype/nanum/NanumBarunGothic.ttf", 0);
+    //ft2_->loadFontData("/home/zeta/Documents/Un.ttf", 0);
 	}
 }
 
@@ -31,4 +32,9 @@ bool z::Widget::focus() {
 }
 void z::Widget::focus(bool tf) {
 	focus_ = tf;
+}
+
+void z::Widget::resize(cv::Rect2i r) {
+	*this = r;
+	cv::resize(mat_, mat_, {r.width, r.height});
 }

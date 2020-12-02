@@ -19,6 +19,7 @@ public:
 	//void register_callback(int event, std::function<void(int,int)> f);
 	bool focus();
 	void focus(bool);
+	void resize(cv::Rect2i r);
 	std::map<int, std::function<void(int, int)>> gui_callback_;//int : event, x, y
 	std::map<int, std::function<void(int, int)>> user_callback_;
 	cv::Mat3b mat_;//widget shape
@@ -95,6 +96,7 @@ public:
 	void keyboard_callback(int key);
 	void update(const Widget &r);
 	std::string title();
+	void resize(cv::Rect2i r);
 	void tie(std::string title, int font, TextInput &t, Button &b, std::vector<std::string> v, int x = -1, int y = -1);
 	void tie(TextInput &t, Button &b1, Button &b2, double start = 0, double step = 1);
 	template<class... T> void tie(T&... checks)

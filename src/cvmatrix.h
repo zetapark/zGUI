@@ -36,9 +36,11 @@ public:
 	}
 
 	void gray();
+	void zoom(cv::Rect2i r);
 	void scale(float x, float y);
 	void noise(int scale);//normal distrubution noise
 	void median(int ksize);//median is good for salt&pepper noise
+	void salt(int n=10);
 	void normalize(float a, float b);
 	void diffx();//after normalize to float
 	void diffy();
@@ -70,7 +72,6 @@ public:
 	void transform4(cv::Point2f src[4], cv::Point2f dst[4], cv::Size sz = {0,0});
 	std::vector<cv::Point> get_points(int k);// ^ affine and perspective transform
 	void get_businesscard(std::vector<cv::Point> v);
-	void slide(int row, int offset);
 	void tear();
 	void quantize(int q);
 	

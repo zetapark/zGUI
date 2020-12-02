@@ -38,7 +38,7 @@ z::AsciiWindow::AsciiWindow(const char *p, int unit_width, int unit_height, int 
 	for(; *p; p++) if(*p == '|') {//construct 2 dim array of asc2 art
 		string s;
 		while(*p != '\n' && *p) s += *p++;
-		s.resize(width, ' ');
+		if(s.size() < width) s.resize(width, ' ');
 		art_.push_back(s);
 	}
 	parsed_ = art_;//for parse check
@@ -110,7 +110,7 @@ bool z::AsciiWindow::parse_widget_area(int y, int x)
 		case 'S': { auto [a, b, c] = get_slider_param(text);
 								S.emplace_back(make_shared<z::Slider>(r, a, b, c)); }
 							break;
-		case 'C': C.emplace_back(make_shared<z::CheckBox>(r)); break;
+		case 'C': C.emplace_back(make_shared<z::CheckBox>(r)); if(text != "") C.back()->checked(true); break;
 		case 'T': T.emplace_back(make_shared<z::TextInput>(r)); T.back()->value(text); break;
 		case 'I': I.emplace_back(make_shared<z::Image>(r));
 							if(text != "") *I.back() = cv::imread(text);

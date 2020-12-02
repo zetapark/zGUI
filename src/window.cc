@@ -67,6 +67,12 @@ z::Window& z::Window::operator+(z::Widget &w)
 	return *this;
 }
 
+void z::Window::resize(cv::Rect2i r)
+{
+	z::Widget::resize(r);
+	for(const auto &a : widgets_) a->mat_.copyTo(mat_(*a));
+}
+
 string z::Window::title()
 {
 	return title_;

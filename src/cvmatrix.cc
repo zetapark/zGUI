@@ -52,6 +52,11 @@ void CVMat::scale(float x, float y) {
 	cv::resize(*this, *this, Size{x * cols, y * rows});
 }
 
+void CVMat::zoom(cv::Rect2i r) {
+	cv::Mat m = (*this)(r).clone();
+	cv::resize(m, *this, size());
+}
+
 void CVMat::rotate(double angle, Point center, double scale) {
 	if(center == Point{-1,-1}) center = {cols/2, rows/2};
 	warpAffine(*this, *this, getRotationMatrix2D(center, angle, scale), size());
@@ -479,6 +484,16 @@ void CVMat::median(int k)
 	medianBlur(*this, *this, k);
 }
 
+void CVMat::salt(int n)
+{
+	cv::Mat noise = cv::Mat::zeros(rows, cols, CV_8U);
+	cv::randu(noise, 0, 255);
+	Mat black = noise < n;
+	Mat white = noise > 255 - n;
+	setTo(255, white);
+	setTo(0, black);
+}
+
 void CVMat::gray()
 {
 	cvtColor(*this, *this, COLOR_BGR2GRAY);
@@ -490,17 +505,6 @@ void CVMat::template_init()
 	feature<BRISK>();
 }
 
-void CVMat::slide(int r, int offset) {
-	Mat m = cv::Mat::zeros({1, cols}, type());
-	for(int x=0; x<cols; x++) m.at<char>(1, x) = at<char>(r, x);
-	for(int x=0; x<cols; x++) {
-		int k = x - offset;
-		while(k >= cols) k -= cols;
-		while(k < 0) k += cols;
-		at<char>(r, x) = m.at<char>(1, k);
-	}
-}
-
 void CVMat::quantize(int q)
 {
 	for(int y = 0; y < rows; y++) for(int x = 0; x < cols; x++)
@@ -510,8 +514,10 @@ void CVMat::quantize(int q)
 void CVMat::tear() {
 	static uniform_int_distribution<> di{-1, 1};
 	static random_device rd;
+	copyTo(harris_);
 	for(int y=0, offset=0; y<rows; y++) {
 		offset += di(rd);
-		slide(y, offset);
+		for(int x=0; x<cols; x++)
+			at<char>(y, x) = harris_.at<char>(y, (x - offset) % cols);
 	}
 }

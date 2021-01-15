@@ -3,7 +3,7 @@ OBJ = $(wildcard *.o)
 TOBJ = $(wildcard *.t)
 EXE = $(patsubst %.x, ../%.x, $(wildcard *.x))
 LDFLAGS =
-LDLIBS = $(shell pkg-config opencv4 --libs) -pthread
+LDLIBS = $(shell pkg-config --libs opencv4 gstreamermm-1.0) -pthread
 
 
 all : $(EXE) ../catch

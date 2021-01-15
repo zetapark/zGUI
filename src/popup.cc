@@ -12,7 +12,11 @@ int z::PopupInterface::open(int flag, int x, int y)
 {
 	window_ptr_->start(flag);
 	if(x >= 0 && y >= 0) cv::moveWindow(window_ptr_->title(), x, y);
-	while(!closed_) if(int key = cv::waitKey(10); key != -1) window_ptr_->keyboard_callback(key);
+	while(!closed_) {
+		try { cv::getWindowProperty(window_ptr_->title(), 0); }
+		catch(...) { break; }
+		if(int key = cv::waitKey(10); key != -1) window_ptr_->keyboard_callback(key);
+	}
 	closed_ = false;
 	return result_;
 }
@@ -30,4 +34,3 @@ z::Popup::Popup(string title, cv::Rect2i r) : z::Window{title, r}, PopupInterfac
 z::AsciiPopup::AsciiPopup(const char *p, int unit_width, int unit_height, int margin)
 	: z::AsciiWindow(p, unit_width, unit_height, margin), PopupInterface{this}
 { }
-

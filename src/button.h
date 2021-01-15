@@ -201,7 +201,7 @@ public:
 	void quit(int r);
 protected:
 	bool closed_ = false;
-	int result_ = 0;
+	int result_ = -1;
 private:
 	Window *window_ptr_ = nullptr;
 };

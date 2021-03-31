@@ -1,5 +1,9 @@
 # OpenCV GUI
 
+## License
+
+LGPL v2
+
 ## Features
 
 - Solely based on opencv (C++)  

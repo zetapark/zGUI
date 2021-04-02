@@ -32,6 +32,7 @@ struct Win : z::AsciiWindow
 	cv::Mat m;
 	int x, y;
 	cv::Scalar color;
+	z::Button bt{"added without ascii", {10, 410, 290, 30}};
 
 	Win() : z::AsciiWindow{R"(
 		WSample------------------------------------
@@ -64,6 +65,8 @@ struct Win : z::AsciiWindow
 		| |1 100 1|
 		|
 		|
+		|
+		|
 		|  C0 L0-  C1 L1-  C2 L2-   C3- L3----
 		|  |v||R|  || |G|  || |B|   ||  |New|
 		|
@@ -75,7 +78,8 @@ struct Win : z::AsciiWindow
 				v.push_back(p.filename());
 		tie("File open", 30, *T[0], *B[0], v);//combo box
 		tie(*C[0], *C[1], *C[2]);//radio button
-		wrap("RGB", 20, 10, *C[0], *L[2]);
+		wrap("RGB", 20, 10, *C[0], *L[2]);//frame
+		*this + bt;
 		start();
 
 		B[1]->click([this]() {

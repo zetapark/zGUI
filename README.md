@@ -49,7 +49,6 @@ LGPL v2
 ```c++
 #include<filesystem>
 #include"zgui.h"
-#include"cvmatrix.h"
 using namespace std;
 
 struct Pop : z::AsciiWindow, z::PopupInterface
@@ -501,7 +500,7 @@ int open(int flag = cv::WINDOW_AUTOSIZE), int x = -1, int y = -1);
 
 open a popup window with flag.
 
-when the pop up window closes with quit(k), this function returns with the k.
+when the pop up window closes with quit(k), this function returns k.
 
 popup appearing position can be set manually with x, y
 

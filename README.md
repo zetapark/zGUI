@@ -1,4 +1,5 @@
 # OpenCV GUI
+moved to https://github.com/ParkSeungwon/opencv-gui
 
 ## License
 
